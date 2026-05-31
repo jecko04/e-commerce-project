@@ -5,6 +5,7 @@ use App\Http\Controllers\Pages\ProductController;
 use App\Http\Controllers\Vendor\VendorProfileController;
 use App\Http\Controllers\Vendor\VendorDashboardController;
 use App\Http\Controllers\Vendor\AddProductController;
+use App\Http\Controllers\Vendor\VendorProductController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -29,6 +30,7 @@ Route::middleware(['auth', 'role:vendor'])->prefix('vendor')->group(function () 
 
     Route::get('/add-product', [AddProductController::class, 'create'])->name('vendor.add-product');
     Route::post('/add-product', [AddProductController::class, 'store'])->name('vendor.store-product');
+    Route::get('/products', [VendorProductController::class, 'index'])->name('vendor.products.index');
 });
 
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');

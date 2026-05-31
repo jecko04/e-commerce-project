@@ -16,7 +16,7 @@ export default function VendorNav() {
                 </Link>
 
                 <Link
-                    href="/vendor/products"
+                    href={route('vendor.products.index')}
                     className="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-zinc-800"
                 >
                     Products

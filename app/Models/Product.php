@@ -28,4 +28,9 @@ class Product extends Model
         'is_featured',
         'published_at',
     ];
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
 }

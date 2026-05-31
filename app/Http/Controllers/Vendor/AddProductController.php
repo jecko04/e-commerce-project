@@ -49,8 +49,8 @@ class AddProductController extends Controller
         ]);
 
         if ($request->hasFile('thumbnail')) {
-            $path = $request->file('thumbnail')->store('public/products');
-            $validated['thumbnail'] = str_replace('public/', 'storage/', $path);
+            $path = $request->file('thumbnail')->store('products', 'public');
+            $validated['thumbnail'] = $path;
         }
 
         $validated['vendor_id'] = auth()->id();
