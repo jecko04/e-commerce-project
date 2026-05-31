@@ -28,6 +28,7 @@ Route::middleware(['auth', 'role:vendor'])->prefix('vendor')->group(function () 
     })->name('vendor.dashboard');
 
     Route::get('/add-product', [AddProductController::class, 'create'])->name('vendor.add-product');
+    Route::post('/add-product', [AddProductController::class, 'store'])->name('vendor.store-product');
 });
 
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');

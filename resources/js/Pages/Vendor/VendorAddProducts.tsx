@@ -1,12 +1,51 @@
 import { useEffect, useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import VendorNav from '@/Components/VendorNav';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, useForm, usePage } from '@inertiajs/react';
+import toast from 'react-hot-toast';
 
-export default function VendorAddProducts() {
+    type Category = {
+        id: number;
+        name: string;
+    }
+
+    type VendorAddProductsProps = {
+        categories: Category[];
+    };
+
+    type PageProps = {
+        auth: {
+            user: {
+                id: number;
+                name: string;
+                email: string;
+                role: string;
+            };
+        };
+        flash?: {
+            success?: string;
+            error?: string;
+        };
+    };
+
+export default function VendorAddProducts({ categories = [], }: VendorAddProductsProps) {
+
     const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
 
+    const { flash } = usePage<PageProps>().props;
+
+    useEffect(() => {
+        if (flash?.success) {
+            toast.success(flash.success);
+        }
+
+        if (flash?.error) {
+            toast.error(flash.error);
+        }
+    }, [flash]);
+
     const { data, setData, post, processing, errors, reset } = useForm({
+        category_id: '',
         name: '',
         slug: '',
         sku: '',
@@ -71,19 +110,19 @@ export default function VendorAddProducts() {
     };
 
     const updateProductIdentity = (name: string, brand: string) => {
-        setData((currentData) => ({
-            ...currentData,
+        setData({
+            ...data,
             name,
             brand,
             slug: generateSlug(name),
             sku: generateSku(name, brand),
-        }));
+        });
     };
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        post(route('vendor.products.store'), {
+        post(route('vendor.store-product'), {
             forceFormData: true,
             onSuccess: () => {
                 reset();
@@ -147,6 +186,40 @@ export default function VendorAddProducts() {
 
                             <section className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
                                 <h2 className="mb-4 text-base font-semibold text-gray-900">
+                                    Categories
+                                </h2>
+
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="mb-1 block text-sm font-medium text-gray-700">
+                                            Product Category
+                                        </label>
+
+                                        <select
+                                            value={data.category_id}
+                                            onChange={(e) => setData('category_id', e.target.value)}
+                                            className="w-full rounded-md border-gray-300"
+                                        >
+                                            <option value="">Select a category</option>
+
+                                            {categories.map((category) => (
+                                                <option key={category.id} value={category.id}>
+                                                    {category.name}
+                                                </option>
+                                            ))}
+                                        </select>
+
+                                        {errors.category_id && (
+                                            <p className="mt-1 text-sm text-red-600">
+                                                {errors.category_id}
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+                            </section>
+
+                            <section className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+                                <h2 className="mb-4 text-base font-semibold text-gray-900">
                                     Status
                                 </h2>
 
@@ -163,7 +236,7 @@ export default function VendorAddProducts() {
                                             <option value="draft">Draft</option>
                                             <option value="active">Active</option>
                                             <option value="inactive">Inactive</option>
-                                            <option value="archived">Archived</option>
+                                            <option value="out_of_stock">Out of Stock</option>
                                         </select>
                                         {errors.status && (
                                             <p className="mt-1 text-sm text-red-600">
@@ -201,6 +274,8 @@ export default function VendorAddProducts() {
                                     </div>
                                 </div>
                             </section>
+
+                            
                         </div>
 
                         <div className="space-y-6 lg:col-span-2">
@@ -264,7 +339,7 @@ export default function VendorAddProducts() {
                                         </label>
                                         <input
                                             value={data.brand}
-                                            onChange={(e) => setData('brand', e.target.value)}
+                                            onChange={(e) => updateProductIdentity(data.name, e.target.value)}
                                             className="w-full rounded-md border-gray-300"
                                         />
                                     </div>
