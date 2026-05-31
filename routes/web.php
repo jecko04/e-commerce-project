@@ -16,7 +16,7 @@ Route::get('/', function () {
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
     ]);
-});
+})->name('home');
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
@@ -25,7 +25,7 @@ Route::get('/dashboard', function () {
 Route::middleware(['auth', 'role:vendor'])->prefix('vendor')->group(function () {
     Route::get('/dashboard', function () {
         return Inertia::render('Vendor/VendorDashboard');
-    });
+    })->name('vendor.dashboard');
 
     Route::get('/add-product', [AddProductController::class, 'create'])->name('vendor.add-product');
 });

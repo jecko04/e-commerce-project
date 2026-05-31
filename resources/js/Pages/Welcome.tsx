@@ -1,9 +1,26 @@
 import { PageProps } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 
+
+
 export default function Welcome({
     auth,
 }: PageProps<{ laravelVersion: string; phpVersion: string }>) {
+
+
+const getDashboardRoute = () => {
+    if (!auth.user) return route('login');
+
+    switch (auth.user.role) {
+        case 'admin':
+            return route('dashboard');
+        case 'vendor':
+            return route('vendor.dashboard');
+        default:
+            return route('home'); 
+    }
+};
+
     return (
         <>
             <Head title="Shop Smart - Home" />
@@ -20,7 +37,7 @@ export default function Welcome({
                         {auth.user ? (
                             <>
                                 <Link
-                                    href={route('dashboard')}
+                                    href={getDashboardRoute()}
                                     className="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600"
                                 >
                                     Dashboard

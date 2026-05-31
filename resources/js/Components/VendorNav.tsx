@@ -3,7 +3,7 @@ import { Link } from '@inertiajs/react';
 export default function VendorNav() {
     return (
         <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-white">
+            <h2 className="text-xl font-semibold leading-tight text-gray-900 ">
                 Vendor Dashboard
             </h2>
 

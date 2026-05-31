@@ -11,8 +11,8 @@ export default function VendorDashboard() {
 
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    <div className="overflow-hidden rounded-xl bg-white shadow-sm dark:bg-zinc-900">
-                        <div className="p-6 text-gray-900 dark:text-white">
+                    <div className="overflow-hidden rounded-xl bg-white shadow-sm">
+                        <div className="p-6 text-gray-900 dark:text-black">
                             You're logged in!
                         </div>
                     </div>
