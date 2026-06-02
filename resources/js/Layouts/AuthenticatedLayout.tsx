@@ -16,40 +16,48 @@ export default function Authenticated({
         useState(false);
 
     return (
-        <div className="min-h-screen bg-gray-100">
-            <nav className="border-b border-gray-100 bg-white">
-                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <div className="flex h-16 justify-between">
-                        <div className="flex">
-                            <div className="flex shrink-0 items-center">
-                                <Link href="/">
-                                    <ApplicationLogo className="block h-9 w-auto fill-current text-gray-800" />
-                                </Link>
-                            </div>
+        <div className="min-h-screen bg-[#f5f7fb] text-slate-950">
+            <div className="pointer-events-none fixed inset-x-0 top-0 h-80 bg-[radial-gradient(circle_at_top_left,_rgba(16,185,129,0.20),_transparent_32%),radial-gradient(circle_at_top_right,_rgba(59,130,246,0.18),_transparent_34%)]" />
 
-                            <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                <NavLink
-                                    href={route('home')}
-                                    active={route().current('home')}
-                                >
-                                    ShopX
-                                </NavLink>
-                            </div>
+            <nav className="sticky top-0 z-30 border-b border-white/70 bg-white/80 shadow-sm shadow-slate-200/60 backdrop-blur-xl">
+                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                    <div className="flex h-20 items-center justify-between">
+                        <div className="flex items-center gap-8">
+                            <Link
+                                href="/"
+                                className="flex items-center gap-3 rounded-xl transition hover:opacity-80"
+                            >
+                                <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-950 text-white shadow-lg shadow-slate-900/20">
+                                    <ApplicationLogo className="block h-6 w-auto fill-current" />
+                                </span>
+                                <span className="hidden sm:block">
+                                    <span className="block text-base font-bold tracking-tight text-slate-950">
+                                        ShopX
+                                    </span>
+                                    <span className="block text-xs font-medium uppercase tracking-[0.18em] text-emerald-600">
+                                        Commerce Hub
+                                    </span>
+                                </span>
+                            </Link>
+
                         </div>
 
-                        <div className="hidden sm:ms-6 sm:flex sm:items-center">
+                        <div className="hidden sm:flex sm:items-center">
                             <div className="relative ms-3">
                                 <Dropdown>
                                     <Dropdown.Trigger>
-                                        <span className="inline-flex rounded-md">
+                                        <span className="inline-flex rounded-full">
                                             <button
                                                 type="button"
-                                                className="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none"
+                                                className="inline-flex items-center gap-3 rounded-full border border-slate-200 bg-white px-3 py-2 text-sm font-semibold leading-4 text-slate-700 shadow-sm transition duration-150 ease-in-out hover:border-slate-300 hover:bg-slate-50 hover:text-slate-950 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
                                             >
-                                                {user.name}
+                                                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-sky-500 text-xs font-bold uppercase text-white">
+                                                    {user.name.charAt(0)}
+                                                </span>
+                                                <span>{user.name}</span>
 
                                                 <svg
-                                                    className="-me-0.5 ms-2 h-4 w-4"
+                                                    className="h-4 w-4 text-slate-400"
                                                     xmlns="http://www.w3.org/2000/svg"
                                                     viewBox="0 0 20 20"
                                                     fill="currentColor"
@@ -89,7 +97,8 @@ export default function Authenticated({
                                         (previousState) => !previousState,
                                     )
                                 }
-                                className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 transition duration-150 ease-in-out hover:bg-gray-100 hover:text-gray-500 focus:bg-gray-100 focus:text-gray-500 focus:outline-none"
+                                className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm transition duration-150 ease-in-out hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                                aria-label="Toggle navigation"
                             >
                                 <svg
                                     className="h-6 w-6"
@@ -128,29 +137,34 @@ export default function Authenticated({
                 <div
                     className={
                         (showingNavigationDropdown ? 'block' : 'hidden') +
-                        ' sm:hidden'
+                        ' border-t border-slate-100 bg-white/95 pb-4 shadow-lg shadow-slate-200/60 sm:hidden'
                     }
                 >
-                    <div className="space-y-1 pb-3 pt-2">
+                    <div className="space-y-1 px-4 pb-3 pt-4">
                         <ResponsiveNavLink
-                            href={route('dashboard')}
-                            active={route().current('dashboard')}
+                            href={route('home')}
+                            active={route().current('home')}
                         >
-                            Dashboard
+                            ShopX
                         </ResponsiveNavLink>
                     </div>
 
-                    <div className="border-t border-gray-200 pb-1 pt-4">
-                        <div className="px-4">
-                            <div className="text-base font-medium text-gray-800">
-                                {user.name}
+                    <div className="mx-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                        <div className="flex items-center gap-3">
+                            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-sky-500 text-sm font-bold uppercase text-white">
+                                {user.name.charAt(0)}
                             </div>
-                            <div className="text-sm font-medium text-gray-500">
-                                {user.email}
+                            <div>
+                                <div className="text-base font-semibold text-slate-950">
+                                    {user.name}
+                                </div>
+                                <div className="text-sm font-medium text-slate-500">
+                                    {user.email}
+                                </div>
                             </div>
                         </div>
 
-                        <div className="mt-3 space-y-1">
+                        <div className="mt-4 space-y-1">
                             <ResponsiveNavLink href={route('profile.edit')}>
                                 Profile
                             </ResponsiveNavLink>
@@ -167,14 +181,18 @@ export default function Authenticated({
             </nav>
 
             {header && (
-                <header className="bg-white shadow">
-                    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-                        {header}
+                <header className="relative border-b border-white/70 bg-white/55 backdrop-blur">
+                    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+                        <div className="px-5 py-5 sm:px-8">
+                            {header}
+                        </div>
                     </div>
                 </header>
             )}
 
-            <main>{children}</main>
+            <main className="relative mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+                {children}
+            </main>
 
             <Toaster position="top-right" />
         </div>

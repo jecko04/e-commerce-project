@@ -1,60 +1,42 @@
 import { Link } from '@inertiajs/react';
 
+const navItems = [
+    { label: 'Dashboard', href: '/vendor/dashboard' },
+    { label: 'Products', href: route('vendor.products.index') },
+    { label: 'Orders', href: '/vendor/orders' },
+    { label: 'Inventory', href: '/vendor/inventory' },
+    { label: 'Earnings', href: '/vendor/earnings' },
+    { label: 'Reviews', href: '/vendor/reviews' },
+];
+
 export default function VendorNav() {
     return (
-        <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold leading-tight text-gray-900 ">
-                Vendor Dashboard
-            </h2>
+        <div className="flex flex-col gap-5 rounded-3xl border border-white/80 bg-white/75 p-5 shadow-xl shadow-slate-200/70 backdrop-blur sm:p-6 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-600">
+                    Seller Workspace
+                </p>
+                <h2 className="mt-1 text-2xl font-bold tracking-tight text-slate-950">
+                    Vendor Dashboard
+                </h2>
+            </div>
 
-            <nav className="flex items-center gap-2 overflow-x-auto">
-                <Link
-                    href="/vendor/dashboard"
-                    className="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-zinc-800"
-                >
-                    Dashboard
-                </Link>
-
-                <Link
-                    href={route('vendor.products.index')}
-                    className="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-zinc-800"
-                >
-                    Products
-                </Link>
+            <nav className="flex items-center gap-2 overflow-x-auto rounded-2xl border border-slate-200 bg-slate-50/90 p-1.5 shadow-inner">
+                {navItems.map((item) => (
+                    <Link
+                        key={item.label}
+                        href={item.href}
+                        className="whitespace-nowrap rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-white hover:text-slate-950 hover:shadow-sm"
+                    >
+                        {item.label}
+                    </Link>
+                ))}
 
                 <Link
                     href={route('vendor.add-product')}
-                    className="rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-600"
+                    className="whitespace-nowrap rounded-xl bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-slate-900/20 transition hover:-translate-y-0.5 hover:bg-emerald-600 hover:shadow-emerald-700/20"
                 >
                     Add Product
-                </Link>
-
-                <Link
-                    href="/vendor/orders"
-                    className="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-zinc-800"
-                >
-                    Orders
-                </Link>
-
-                <Link
-                    href="/vendor/inventory"
-                    className="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-zinc-800"
-                >
-                    Inventory
-                </Link>
-
-                <Link
-                    href="/vendor/earnings"
-                    className="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-zinc-800"
-                >
-                    Earnings
-                </Link>
-
-                <Link
-                    href="/vendor/reviews"
-                    className="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-zinc-800"
-                >
-                    Reviews
                 </Link>
             </nav>
         </div>
