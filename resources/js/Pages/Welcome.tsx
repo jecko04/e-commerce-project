@@ -12,10 +12,12 @@ const getDashboardRoute = () => {
     if (!auth.user) return route('login');
 
     switch (auth.user.role) {
-        case 'admin':
+        case 'client':
             return route('dashboard');
         case 'vendor':
             return route('vendor.dashboard');
+        case 'admin':
+            return route('admin.dashboard');
         default:
             return route('home'); 
     }

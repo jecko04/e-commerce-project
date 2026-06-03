@@ -33,17 +33,25 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        $user = auth()->user();
+        $user = auth()->user(); // client/user
+
+        if (! $user->hasVerifiedEmail()) {
+        return redirect()->route('verification.notice');
+        }
+
+        if ($user->role === 'client') {
+            return redirect()->route('dashboard');
+        }
 
         if ($user->role === 'admin') {
-            return redirect('/dashboard');
+            return redirect()->route('admin.dashboard');
         }
 
         if ($user->role === 'vendor') {
-            return redirect('/vendor/dashboard');
+            return redirect()->route('vendor.dashboard');
         }
 
-        return redirect('/'); // client/user
+        return redirect()->route('home');
     }
 
     /**

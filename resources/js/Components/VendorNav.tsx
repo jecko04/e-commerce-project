@@ -4,7 +4,7 @@ const navItems = [
     { label: 'Dashboard', href: '/vendor/dashboard' },
     { label: 'Products', href: route('vendor.products.index') },
     { label: 'Orders', href: '/vendor/orders' },
-    { label: 'Inventory', href: '/vendor/inventory' },
+    { label: 'Inventory', href: route('vendor.inventory.index') },
     { label: 'Earnings', href: '/vendor/earnings' },
     { label: 'Reviews', href: '/vendor/reviews' },
 ];

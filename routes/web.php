@@ -6,6 +6,7 @@ use App\Http\Controllers\Vendor\VendorProfileController;
 use App\Http\Controllers\Vendor\VendorDashboardController;
 use App\Http\Controllers\Vendor\AddProductController;
 use App\Http\Controllers\Vendor\VendorProductController;
+use App\Http\Controllers\Vendor\InventoryController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -19,11 +20,13 @@ Route::get('/', function () {
     ]);
 })->name('home');
 
+// add verified middleware later
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
-})->middleware(['auth', 'role:admin'])->name('dashboard');
+})->middleware(['auth', 'role:client', 'verified'])->name('dashboard');
 
-Route::middleware(['auth', 'verified', 'role:vendor'])->prefix('vendor')->group(function () {
+// add verified middleware later
+Route::middleware(['auth', 'role:vendor', 'verified'])->prefix('vendor')->group(function () {
     Route::get('/dashboard', function () {
         return Inertia::render('Vendor/VendorDashboard');
     })->name('vendor.dashboard');
@@ -31,10 +34,12 @@ Route::middleware(['auth', 'verified', 'role:vendor'])->prefix('vendor')->group(
     Route::get('/add-product', [AddProductController::class, 'create'])->name('vendor.add-product');
     Route::post('/add-product', [AddProductController::class, 'store'])->name('vendor.store-product');
     Route::get('/products', [VendorProductController::class, 'index'])->name('vendor.products.index');
+    Route::get('/inventory', [InventoryController::class, 'index'])->name('vendor.inventory.index');
 });
 
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 
+// add verified middleware later
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
