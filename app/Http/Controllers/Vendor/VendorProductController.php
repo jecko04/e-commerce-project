@@ -15,7 +15,7 @@ class VendorProductController extends Controller
         $products = Product::where('vendor_id', auth()->id())
             ->with('category:id,name')
             ->latest()
-            ->get(['id', 'category_id', 'name', 'slug', 'sku','thumbnail', 'price', 'sale_price', 'stock_quantity', 'status', 'created_at']);
+            ->get(['id', 'category_id', 'name', 'slug', 'brand','sku','thumbnail', 'price', 'sale_price', 'stock_quantity', 'status', 'created_at']);
 
         $categories = Category::where('is_active', true)
             ->orderBy('name')

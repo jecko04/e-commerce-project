@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import VendorNav from '@/Components/VendorNav';
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 
 type Category = {
     id: number;
@@ -91,78 +91,123 @@ export default function VendorProducts({
                         </div>
                     </div>
 
-                    {filteredProducts.length > 0 ? (
-                        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-                            {filteredProducts.map((product) => (
-                                <div
-                                    key={product.id}
-                                    className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm"
-                                >
-                                    <div className="aspect-square bg-gray-100">
-                                        {product.thumbnail ? (
-                                            <img
-                                                src={`/storage/${product.thumbnail}`}
-                                                alt={product.name}
-                                                className="h-full w-full object-cover"
-                                            />
+           {filteredProducts.length > 0 ? (
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
+                {filteredProducts.map((product) => {
+                    const hasSale = Boolean(product.sale_price);
+                    const isLowStock =
+                        product.stock_quantity > 0 && product.stock_quantity <= 10;
+                    const isOutOfStock = product.stock_quantity <= 0;
+
+                    return (
+                        <Link
+                            key={product.id}
+                            href={route('vendor.view-products.show', product.slug)}
+                            className="group overflow-hidden rounded-3xl border border-white/70 bg-white/90 shadow-sm shadow-slate-200/70 transition duration-200 hover:-translate-y-1 hover:border-emerald-300 hover:shadow-xl hover:shadow-slate-200/90 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                        >
+                            <div className="relative aspect-square overflow-hidden bg-slate-100">
+                                {product.thumbnail ? (
+                                    <img
+                                        src={`/storage/${product.thumbnail}`}
+                                        alt={product.name}
+                                        className="h-full w-full object-cover transition duration-300"
+                                    />
+                                ) : (
+                                    <div className="flex h-full items-center justify-center text-xs font-semibold text-slate-400">
+                                        No image
+                                    </div>
+                                )}
+
+                                <div className="absolute left-3 top-3 flex flex-wrap gap-2">
+
+                                    {hasSale && (
+                                        <span className="rounded-full bg-red-50 px-2.5 py-1 text-xs font-bold text-red-700 ring-1 ring-inset ring-red-200">
+                                            Sale
+                                        </span>
+                                    )}
+
+                                    {isOutOfStock ? (
+                                        <span className="rounded-full bg-red-50 px-2.5 py-1 text-xs font-bold text-red-700 ring-1 ring-inset ring-red-200">
+                                            Out of stock
+                                        </span>
+                                    ) : isLowStock ? (
+                                        <span className="rounded-full bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-700 ring-1 ring-inset ring-amber-200">
+                                            Low stock
+                                        </span>
+                                    ) : (
+                                        <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700 ring-1 ring-inset ring-emerald-200">
+                                            In stock
+                                        </span>
+                                    )}
+                                </div>
+
+                                <div className="absolute bottom-3 right-3 rounded-full bg-white/90 px-3 py-1 text-xs font-bold text-slate-700 shadow-sm backdrop-blur">
+                                    {product.stock_quantity} left
+                                </div>
+                            </div>
+
+                            <div className="space-y-4 p-4">
+                                <div>
+                                    <p className="truncate text-xs font-semibold uppercase tracking-[0.16em] text-emerald-600">
+                                        {product.category?.name ?? 'No category'}
+                                    </p>
+
+                                    <h2 className="mt-2 line-clamp-2 min-h-[2.5rem] text-sm font-bold leading-5 text-slate-950 transition group-hover:text-emerald-700">
+                                        {product.name}
+                                    </h2>
+
+                                    <p className="mt-1 truncate text-xs font-medium text-slate-500">
+                                        {product.brand ?? 'No brand'} · {product.sku ?? 'No SKU'}
+                                    </p>
+                                </div>
+
+                                <div className="flex items-end justify-between gap-3">
+                                    <div>
+                                        {hasSale ? (
+                                            <>
+                                                <p className="text-lg font-bold text-red-600">
+                                                    ₱{product.sale_price}
+                                                </p>
+                                                <p className="text-xs font-medium text-slate-400 line-through">
+                                                    ₱{product.price}
+                                                </p>
+                                            </>
                                         ) : (
-                                            <div className="flex h-full items-center justify-center text-xs text-gray-400">
-                                                No image
-                                            </div>
+                                            <p className="text-lg font-bold text-slate-950">
+                                                ₱{product.price}
+                                            </p>
                                         )}
                                     </div>
 
-                                    <div className="space-y-2 p-3">
-                                        <div>
-                                            <h2 className="line-clamp-2 text-sm font-semibold text-gray-900">
-                                                {product.name}
-                                            </h2>
-
-                                            <p className="mt-0.5 truncate text-xs text-gray-500">
-                                                {product.category?.name ?? 'No category'}
-                                            </p>
-                                        </div>
-
-                                        <div className="flex items-center justify-between gap-2">
-                                            <div>
-                                                {product.sale_price ? (
-                                                    <>
-                                                        <p className="text-sm font-bold text-red-600">
-                                                            ₱{product.sale_price}
-                                                        </p>
-                                                        <p className="text-xs text-gray-400 line-through">
-                                                            ₱{product.price}
-                                                        </p>
-                                                    </>
-                                                ) : (
-                                                    <p className="text-sm font-bold text-gray-900">
-                                                        ₱{product.price}
-                                                    </p>
-                                                )}
-                                            </div>
-
-                                            <span className="rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-600">
-                                                {product.status}
-                                            </span>
-                                        </div>
-
-                                        <div className="flex items-center justify-between text-xs text-gray-500">
-                                            <span className="truncate">
-                                                {product.sku ?? 'No SKU'}
-                                            </span>
-                                            <span>{product.stock_quantity} stock</span>
-                                        </div>
-                                    </div>
+                                    <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-bold capitalize text-slate-600">
+                                        {product.status}
+                                    </span>
                                 </div>
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="rounded-lg border border-dashed border-gray-300 bg-white p-8 text-center">
-                            <p className="text-sm text-gray-500">
-                                No products found.
-                            </p>
-                        </div>
-                    )}
+
+                                <div className="flex items-center justify-between border-t border-slate-100 pt-3">
+                                    <span className="text-xs font-semibold text-slate-400">
+                                        View details
+                                    </span>
+
+                                    <span className="text-sm font-bold text-emerald-600 transition group-hover:translate-x-1">
+                                        →
+                                    </span>
+                                </div>
+                            </div>
+                        </Link>
+                    );
+                })}
+            </div>
+        ) : (
+            <div className="rounded-3xl border border-dashed border-slate-300 bg-white/80 p-10 text-center shadow-sm">
+                <p className="text-sm font-bold text-slate-700">
+                    No products found.
+                </p>
+                <p className="mt-1 text-sm text-slate-500">
+                    Try changing your search or category filter.
+                </p>
+            </div>
+        )}
                 </div>
             </div>
         </AuthenticatedLayout>
