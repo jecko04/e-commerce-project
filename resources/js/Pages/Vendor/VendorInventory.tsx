@@ -1,6 +1,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
 import VendorNav from '@/Components/VendorNav';
+import { useState } from 'react';
 
 type Title = {
     title: string;
@@ -19,6 +20,7 @@ type Product = {
     brand?: string | null;
     price: string | number;
     sale_price?: string | number | null;
+    cost_price?: string | number | null;
     stock_quantity: number;
     status: string;
     thumbnail?: string | null;
@@ -45,6 +47,9 @@ export default function VendorInventory({
     const outOfStockCount = products.filter(
         (product) => product.stock_quantity <= 0
     ).length;
+
+    // const [categoryId, setCategoryId] = useState('');
+    
 
     const getStockLabel = (quantity: number) => {
         if (quantity <= 0) {
@@ -100,6 +105,9 @@ export default function VendorInventory({
                                             Product
                                         </th>
                                         <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                            Cost
+                                        </th>
+                                        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                                             Category
                                         </th>
                                         <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
@@ -149,6 +157,10 @@ export default function VendorInventory({
                                                                 </p>
                                                             </div>
                                                         </div>
+                                                    </td>
+
+                                                    <td className="px-6 py-4 text-sm text-gray-600">
+                                                        {product.cost_price || null}
                                                     </td>
 
                                                     <td className="px-6 py-4 text-sm text-gray-600">

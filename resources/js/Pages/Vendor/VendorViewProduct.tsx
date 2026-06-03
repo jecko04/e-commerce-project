@@ -1,6 +1,7 @@
+import { FormEventHandler, useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import VendorNav from '@/Components/VendorNav';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 
 type Category = {
     id: number;
@@ -30,7 +31,28 @@ export default function VendorViewProduct({
     title,
     product,
 }: VendorViewProductProps) {
+    const [showEditModal, setShowEditModal] = useState(false);
     const lowStockLimit = 10;
+
+    const { data, setData, patch, processing, errors, reset } = useForm({
+        status: product.status,
+        price: String(product.price ?? ''),
+        sale_price: String(product.sale_price ?? ''),
+    });
+
+    const closeModal = () => {
+        setShowEditModal(false);
+        reset();
+    };
+
+    const submit: FormEventHandler = (e) => {
+        e.preventDefault();
+
+        patch(route('vendor.view-products.update', product.id), {
+            preserveScroll: true,
+            onSuccess: () => setShowEditModal(false),
+        });
+    };
 
     const formatPrice = (value?: string | number | null) => {
         if (!value) return 'PHP 0.00';
@@ -105,11 +127,21 @@ export default function VendorViewProduct({
                         </div>
 
                         <aside className="h-fit rounded-3xl border border-white/70 bg-white/85 p-6 shadow-xl shadow-slate-200/70 backdrop-blur">
-                            <span
-                                className={`inline-flex rounded-full px-3 py-1 text-xs font-bold ring-1 ring-inset ${stockStatus.className}`}
-                            >
-                                {stockStatus.label}
-                            </span>
+                            <div className="flex items-center justify-between gap-2">
+                                <span
+                                    className={`inline-flex rounded-full px-3 py-1 text-xs font-bold ring-1 ring-inset ${stockStatus.className}`}
+                                >
+                                    {stockStatus.label}
+                                </span>
+
+                                <button
+                                    type="button"
+                                    onClick={() => setShowEditModal(true)}
+                                    className="inline-flex rounded-full bg-slate-950 px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                                >
+                                    Edit
+                                </button>
+                            </div>
 
                             <h2 className="mt-4 text-xl font-bold text-slate-950">
                                 {product.name}
@@ -177,6 +209,128 @@ export default function VendorViewProduct({
                     </div>
                 </div>
             </div>
+
+            {showEditModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6">
+                    <div
+                        className="absolute inset-0 bg-slate-950/50 backdrop-blur-sm"
+                        onClick={closeModal}
+                    />
+
+                    <div className="relative w-full max-w-lg overflow-hidden rounded-3xl border border-white/70 bg-white shadow-2xl shadow-slate-950/20">
+                        <div className="border-b border-slate-100 px-6 py-5">
+                            <div className="flex items-start justify-between gap-4">
+                                <div>
+                                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600">
+                                        Update Product
+                                    </p>
+                                    <h2 className="mt-1 text-xl font-bold text-slate-950">
+                                        Edit product details
+                                    </h2>
+                                    <p className="mt-1 text-sm text-slate-500">
+                                        Change public status, regular price, and sale price.
+                                    </p>
+                                </div>
+
+                                <button
+                                    type="button"
+                                    onClick={closeModal}
+                                    className="rounded-full p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+                                >
+                                    ✕
+                                </button>
+                            </div>
+                        </div>
+
+                        <form onSubmit={submit} className="space-y-5 px-6 py-6">
+                            <div>
+                                <label className="text-sm font-bold text-slate-700">
+                                    Public status
+                                </label>
+
+                                <select
+                                    value={data.status}
+                                    onChange={(e) => setData('status', e.target.value)}
+                                    className="mt-2 w-full rounded-2xl border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm transition focus:border-emerald-500 focus:ring-emerald-500"
+                                >
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
+                                    <option value="draft">Draft</option>
+                                    <option value="out_of_stock">Out of Stock</option>
+                                </select>
+
+                                {errors.status && (
+                                    <p className="mt-2 text-sm font-medium text-red-600">
+                                        {errors.status}
+                                    </p>
+                                )}
+                            </div>
+
+                            <div>
+                                <label className="text-sm font-bold text-slate-700">
+                                    Regular price
+                                </label>
+
+                                <input
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    value={data.price}
+                                    onChange={(e) => setData('price', e.target.value)}
+                                    className="mt-2 w-full rounded-2xl border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm transition focus:border-emerald-500 focus:ring-emerald-500"
+                                    placeholder="0.00"
+                                />
+
+                                {errors.price && (
+                                    <p className="mt-2 text-sm font-medium text-red-600">
+                                        {errors.price}
+                                    </p>
+                                )}
+                            </div>
+
+                            <div>
+                                <label className="text-sm font-bold text-slate-700">
+                                    Sale price
+                                </label>
+
+                                <input
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    value={data.sale_price}
+                                    onChange={(e) => setData('sale_price', e.target.value)}
+                                    className="mt-2 w-full rounded-2xl border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm transition focus:border-emerald-500 focus:ring-emerald-500"
+                                    placeholder="Leave empty if no sale"
+                                />
+
+                                {errors.sale_price && (
+                                    <p className="mt-2 text-sm font-medium text-red-600">
+                                        {errors.sale_price}
+                                    </p>
+                                )}
+                            </div>
+
+                            <div className="flex items-center justify-end gap-3 border-t border-slate-100 pt-5">
+                                <button
+                                    type="button"
+                                    onClick={closeModal}
+                                    className="rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-600 transition hover:bg-slate-50"
+                                >
+                                    Cancel
+                                </button>
+
+                                <button
+                                    type="submit"
+                                    disabled={processing}
+                                    className="rounded-2xl bg-slate-950 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-slate-900/20 transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+                                >
+                                    {processing ? 'Saving...' : 'Save changes'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </AuthenticatedLayout>
     );
 }

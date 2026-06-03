@@ -22,5 +22,25 @@ class VendorViewProductController extends Controller
                 'product' => $product,
             ]);
         }
+
+        public function update(Request $request, Product $product) {
+            abort_if($product->vendor_id !== auth()->id(), 403);
+
+            $validated = $request->validate([
+                'status' => ['required', 'in:active,inactive,draft,out_of_stock'],
+                'price' => ['required', 'numeric', 'min:0'],
+                'sale_price' => ['nullable', 'numeric', 'min:0', 'lt:price'],
+            ]);
+
+            $product->update([
+                'status' => $validated['status'],
+                'price' => $validated['price'],
+                'sale_price' => $validated['sale_price'] ?? null,
+            ]);
+
+        
+            return back()
+            ->with('success', 'Product created successfully.');
+        }
 }
 
