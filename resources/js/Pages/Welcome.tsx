@@ -1,11 +1,37 @@
 import { PageProps } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 
+type Category = {
+    id: number;
+    name: string;
+};
+
+type Product = {
+    id: number;
+    name: string;
+    slug: string;
+    sku?: string | null;
+    brand?: string | null;
+    price: string | number;
+    sale_price?: string | number | null;
+    stock_quantity: number;
+    status: string;
+    thumbnail?: string | null;
+    category?: Category | null;
+};
+
+type Props = {
+    auth: PageProps['auth'];
+    categories: Category[];
+    products: Product[];
+};
 
 
 export default function Welcome({
     auth,
-}: PageProps<{ laravelVersion: string; phpVersion: string }>) {
+    categories,
+    products
+}: Props) {
 
 
 const getDashboardRoute = () => {
