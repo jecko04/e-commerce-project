@@ -28,4 +28,21 @@ class InventoryController extends Controller
             'categories' => $categories,
         ]);
     }
+
+    public function update(Request $request, Product $product) {
+        abort_if($product->vendor_id !== auth()->id(), 403);
+
+        $validated = $request->validate([
+            'stock_quantity' => ['required', 'integer', 'min:0'],
+        ]);
+
+        $product->update([
+            'stock_quantity' => $validated['stock_quantity'],
+        ]);
+
+    
+        return redirect()
+        ->route('vendor.inventory.index')
+        ->with('success', 'Product stock updated successfully.');
+    }
 }

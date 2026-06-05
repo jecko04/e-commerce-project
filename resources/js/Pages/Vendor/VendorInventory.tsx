@@ -1,7 +1,9 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
 import VendorNav from '@/Components/VendorNav';
-import { useState } from 'react';
+import { FormEventHandler, useState, useEffect } from 'react';
+import { useForm, usePage } from '@inertiajs/react';
+import toast from 'react-hot-toast';
 
 type Title = {
     title: string;
@@ -33,11 +35,27 @@ type VendorProductsProps = {
     categories: Category[];
 };
 
+type PageProps = {
+    auth: {
+        user: {
+            id: number;
+            name: string;
+            email: string;
+            role: string;
+        };
+    };
+    flash?: {
+        success?: string;
+        error?: string;
+    };
+};
+
 export default function VendorInventory({
     products = [],
-    categories = [],
     title,
 }: VendorProductsProps & Title) {
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
     const lowStockLimit = 10;
 
     const totalProducts = products.length;
@@ -48,7 +66,41 @@ export default function VendorInventory({
         (product) => product.stock_quantity <= 0
     ).length;
 
-    // const [categoryId, setCategoryId] = useState('');
+    const { flash } = usePage<PageProps>().props;
+    
+        useEffect(() => {
+            if (flash?.success) {
+                toast.success(flash.success);
+            }
+    
+            if (flash?.error) {
+                toast.error(flash.error);
+            }
+        }, [flash]);
+
+    const { data, setData, patch, processing, errors, reset } = useForm({
+        stock_quantity: '',
+    });
+
+    const closeModal = () => {
+            setShowEditModal(false);
+            reset();
+        };
+    
+        const submit: FormEventHandler = (e) => {
+            e.preventDefault();
+
+            if (!selectedProduct) return;
+
+            patch(route('vendor.inventory.update', selectedProduct.id), {
+                preserveScroll: true,
+                onSuccess: () => {
+                    setShowEditModal(false);
+                    setSelectedProduct(null);
+                    reset();
+                },
+            });
+        };
     
 
     const getStockLabel = (quantity: number) => {
@@ -188,12 +240,17 @@ export default function VendorInventory({
 
                                                     <td className="px-6 py-4 text-right">
                                                         {product.stock_quantity <= lowStockLimit ? (
-                                                            <Link
-                                                                href="#"
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => {
+                                                                    setSelectedProduct(product);
+                                                                    setData('stock_quantity', String(product.stock_quantity));
+                                                                    setShowEditModal(true);
+                                                                }}
                                                                 className="inline-flex items-center rounded-lg bg-amber-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-amber-700"
                                                             >
                                                                 Restock
-                                                            </Link>
+                                                            </button>
                                                         ) : (
                                                             <span className="text-sm text-gray-400">
                                                                 No action needed
@@ -206,7 +263,7 @@ export default function VendorInventory({
                                     ) : (
                                         <tr>
                                             <td
-                                                colSpan={6}
+                                                colSpan={7}
                                                 className="px-6 py-12 text-center text-sm text-gray-500"
                                             >
                                                 No inventory items found.
@@ -217,6 +274,94 @@ export default function VendorInventory({
                             </table>
                         </div>
                     </div>
+
+                    {showEditModal && selectedProduct &&(
+                        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6">
+                            <div
+                                className="absolute inset-0 bg-slate-950/50 backdrop-blur-sm"
+                                onClick={() => setShowEditModal(false)}
+                            />
+
+                            <div className="relative w-full max-w-lg overflow-hidden rounded-3xl border border-white/70 bg-white shadow-2xl shadow-slate-950/20">
+                                <div className="border-b border-slate-100 px-6 py-5">
+                                    <div className="flex items-start justify-between gap-4">
+                                        <div>
+                                            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600">
+                                                Restock Product
+                                            </p>
+                                            <h2 className="mt-1 text-xl font-bold text-slate-950">
+                                                Update item stock
+                                            </h2>
+                                            <p className="mt-1 text-sm text-slate-500">
+                                                Set the current stock count.
+                                            </p>
+                                        </div>
+
+                                        <button
+                                            type="button"
+                                            onClick={() => closeModal()}
+                                            className="rounded-full p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <form onSubmit={submit} className="space-y-5 px-6 py-6">
+                                    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                                        <p className="text-sm font-bold text-slate-700">
+                                            Current stock
+                                        </p>
+                                        <p className="mt-1 text-3xl font-bold text-slate-950">
+                                            {selectedProduct?.stock_quantity}
+                                        </p>
+                                        <p className="mt-1 text-sm font-medium text-slate-500">
+                                            {selectedProduct?.name}
+                                        </p>
+                                    </div>
+
+                                    <div>
+                                        <label className="text-sm font-bold text-slate-700">
+                                            Quantity
+                                        </label>
+
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            value={data.stock_quantity}
+                                            onChange={(e) => setData('stock_quantity', e.target.value)}
+                                            className="mt-2 w-full rounded-2xl border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm transition focus:border-emerald-500 focus:ring-emerald-500"
+                                            placeholder="Enter stock quantity"
+                                        />
+
+                                        {errors.stock_quantity && (
+                                            <p className="mt-2 text-sm font-medium text-red-600">
+                                                {errors.stock_quantity}
+                                            </p>
+                                        )}
+                                    </div>
+
+                                    <div className="flex items-center justify-end gap-3 border-t border-slate-100 pt-5">
+                                        <button
+                                            type="button"
+                                            onClick={() => closeModal()}
+                                            className="rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-600 transition hover:bg-slate-50"
+                                        >
+                                            Cancel
+                                        </button>
+
+                                        <button
+                                            type="submit"
+                                            disabled={processing}
+                                            className="rounded-2xl bg-slate-950 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-slate-900/20 transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+                                        >
+                                            {processing ? 'Updating...' : 'Update stock'}
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </AuthenticatedLayout>

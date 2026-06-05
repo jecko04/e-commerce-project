@@ -39,8 +39,9 @@ class VendorViewProductController extends Controller
             ]);
 
         
-            return back()
-            ->with('success', 'Product created successfully.');
+            return redirect()
+            ->route('vendor.view-products.show', $product->slug)
+            ->with('success', 'Product updated successfully.');
         }
 }
 

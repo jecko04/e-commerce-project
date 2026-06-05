@@ -38,6 +38,7 @@ Route::middleware(['auth', 'role:vendor', 'verified'])->prefix('vendor')->group(
     Route::get('/inventory', [InventoryController::class, 'index'])->name('vendor.inventory.index');
     Route::get('/view-products/{slug}', [VendorViewProductController::class, 'show'])->name('vendor.view-products.show');
     Route::patch('view-products/{product}', [VendorViewProductController::class, 'update'])->name('vendor.view-products.update');
+    Route::patch('inventory/{product}', [InventoryController::class, 'update'])->name('vendor.inventory.update');
 });
 
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');

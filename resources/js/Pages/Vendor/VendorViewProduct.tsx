@@ -2,6 +2,9 @@ import { FormEventHandler, useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import VendorNav from '@/Components/VendorNav';
 import { Head, Link, useForm } from '@inertiajs/react';
+import toast from 'react-hot-toast';
+import { usePage } from '@inertiajs/react';
+import { useEffect } from 'react';
 
 type Category = {
     id: number;
@@ -27,12 +30,39 @@ type VendorViewProductProps = {
     product: Product;
 };
 
+type PageProps = {
+    auth: {
+        user: {
+            id: number;
+            name: string;
+            email: string;
+            role: string;
+        };
+    };
+    flash?: {
+        success?: string;
+        error?: string;
+    };
+};
+
 export default function VendorViewProduct({
     title,
     product,
 }: VendorViewProductProps) {
     const [showEditModal, setShowEditModal] = useState(false);
     const lowStockLimit = 10;
+
+    const { flash } = usePage<PageProps>().props;
+    
+        useEffect(() => {
+            if (flash?.success) {
+                toast.success(flash.success);
+            }
+    
+            if (flash?.error) {
+                toast.error(flash.error);
+            }
+        }, [flash]);
 
     const { data, setData, patch, processing, errors, reset } = useForm({
         status: product.status,
