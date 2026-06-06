@@ -13,18 +13,18 @@ export default function Authenticated({
     
     const user = usePage().props.auth.user;
 
-    const getProfiles = () => {
-    if (!user) return route('login');
+    // const getProfiles = () => {
+    // if (!user) return route('login');
 
-        switch (user.role) {
-            case 'vendor':
-                return route('vendor.profile');
-            case 'admin':
-                return route('admin.profile');
-            default:
-                return route('home'); 
-        }
-    };
+    //     switch (user.role) {
+    //         case 'vendor':
+    //             return route('vendor.profile');
+    //         case 'admin':
+    //             return route('admin.profile');
+    //         default:
+    //             return route('home'); 
+    //     }
+    // };
 
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);

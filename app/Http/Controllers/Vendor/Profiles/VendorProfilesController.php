@@ -3,16 +3,17 @@
 namespace App\Http\Controllers\Vendor\Profiles;
 
 use App\Http\Controllers\Controller;
-use App\Models\VendorDetailsModel;
+use App\Models\VendorProfilesModel;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Storage;
 
 class VendorProfilesController extends Controller
 {
     public function edit()
     {
-        $vendorDetails = VendorDetailsModel::where('vendor_id', auth()->id())->first();
+        $vendorDetails = VendorProfilesModel::where('vendor_id', auth()->id())->first();
 
         return Inertia::render('Vendor/Profiles/VendorProfiles', [
             'vendorDetails' => $vendorDetails,
@@ -21,7 +22,7 @@ class VendorProfilesController extends Controller
 
     public function update(Request $request)
     {
-        $vendorDetails = VendorDetailsModel::where('vendor_id', auth()->id())->first();
+        $vendorDetails = VendorProfilesModel::where('vendor_id', auth()->id())->first();
 
         $validated = $request->validate([
             'store_name' => ['required', 'string', 'max:255'],
@@ -46,6 +47,8 @@ class VendorProfilesController extends Controller
             'contact_number' => ['nullable', 'string', 'max:20'],
         ]);
 
+        unset($validated['store_logo'], $validated['store_banner']);
+
         $vendorId = auth()->id();
 
         if ($request->hasFile('store_logo')) {
@@ -53,10 +56,9 @@ class VendorProfilesController extends Controller
                 Storage::disk('public')->delete($vendorDetails->store_logo);
             }
 
-            $extension = $request->file('store_logo')->getClientOriginalExtension();
             $validated['store_logo'] = $request->file('store_logo')->storeAs(
                 'vendor/logo',
-                'vendor-' . $vendorId . '-logo-' . time() . '.' . $extension,
+                'vendor-' . $vendorId . '-logo-' . time() . '.' . $request->file('store_logo')->getClientOriginalExtension(),
                 'public'
             );
         }
@@ -66,15 +68,14 @@ class VendorProfilesController extends Controller
                 Storage::disk('public')->delete($vendorDetails->store_banner);
             }
 
-            $extension = $request->file('store_banner')->getClientOriginalExtension();
             $validated['store_banner'] = $request->file('store_banner')->storeAs(
                 'vendor/banner',
-                'vendor-' . $vendorId . '-banner-' . time() . '.' . $extension,
+                'vendor-' . $vendorId . '-banner-' . time() . '.' . $request->file('store_banner')->getClientOriginalExtension(),
                 'public'
             );
         }
 
-        VendorDetailsModel::updateOrCreate(
+        VendorProfilesModel::updateOrCreate(
             ['vendor_id' => auth()->id()],
             [
                 ...$validated,

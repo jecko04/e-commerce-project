@@ -4,6 +4,28 @@ import { Head, useForm, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 
+type VendorProfiles = {
+    id: number;
+    vendor_id: number;
+    store_name: string;
+    store_slug: string;
+    store_logo: string | null;
+    store_banner: string | null;
+    store_description: string;
+    store_category: string;
+    public_email: string;
+    public_phone: string;
+    business_name: string;
+    business_registration_number: string;
+    tax_identification_number: string;
+    pickup_address: string;
+    warehouse_address: string;
+    contact_person: string;
+    contact_number: string;
+    status: string;
+    verification_status: string;
+    verification_remarks: string | null;
+};
 
 type PageProps = {
         auth: {
@@ -20,7 +42,15 @@ type PageProps = {
         };
     };
 
-export default function VendorProfiles() {
+type Props = {
+    auth: PageProps['auth'];
+    vendorDetails: VendorProfiles;
+};
+
+export default function VendorProfiles({
+    vendorDetails,
+    auth,
+}: Props) {
 
     const { flash } = usePage<PageProps>().props;
 
@@ -34,23 +64,51 @@ export default function VendorProfiles() {
         }
     }, [flash]);
 
-    const { data, setData, patch, processing, errors } = useForm({
-        store_name: '',
-        store_slug: '',
+    const { data, setData, post, processing, errors } = useForm({
+        store_name: vendorDetails?.store_name ?? '',
+        store_slug: vendorDetails?.store_slug ?? '',
         store_logo: null as File | null,
         store_banner: null as File | null,
-        store_description: '',
-        store_category: '',
-        public_email: '',
-        public_phone: '',
-        business_name: '',
-        business_registration_number: '',
-        tax_identification_number: '',
-        pickup_address: '',
-        warehouse_address: '',
-        contact_person: '',
-        contact_number: '',
+        store_description: vendorDetails?.store_description ?? '',
+        store_category: vendorDetails?.store_category ?? '',
+        public_email: vendorDetails?.public_email ?? '',
+        public_phone: vendorDetails?.public_phone ?? '',
+        business_name: vendorDetails?.business_name ?? '',
+        business_registration_number:
+            vendorDetails?.business_registration_number ?? '',
+        tax_identification_number:
+            vendorDetails?.tax_identification_number ?? '',
+        pickup_address: vendorDetails?.pickup_address ?? '',
+        warehouse_address: vendorDetails?.warehouse_address ?? '',
+        contact_person: vendorDetails?.contact_person ?? '',
+        contact_number: vendorDetails?.contact_number ?? '',
     });
+    const [logoPreview, setLogoPreview] = useState(
+        vendorDetails?.store_logo ? `/storage/${vendorDetails.store_logo}` : null,
+    );
+
+    const [bannerPreview, setBannerPreview] = useState(
+        vendorDetails?.store_banner ? `/storage/${vendorDetails.store_banner}` : null,
+    );
+
+    const handleLogoChange = (file: File | null) => {
+        setData('store_logo', file);
+
+        if (file) {
+            setLogoPreview(URL.createObjectURL(file));
+        }
+    };
+
+    const handleBannerChange = (file: File | null) => {
+        setData('store_banner', file);
+
+        if (file) {
+            setBannerPreview(URL.createObjectURL(file));
+        }
+    };
+
+    const status = vendorDetails?.status ?? 'inactive';
+    const verificationStatus = vendorDetails?.verification_status ?? 'unverified';
 
     const generateSlug = (value: string) => {
         return value
@@ -80,7 +138,7 @@ export default function VendorProfiles() {
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        patch(route('vendor.profile.update'), {
+        post(route('vendor.profile.update'), {
             forceFormData: true,
             preserveScroll: true,
         });
@@ -106,26 +164,55 @@ export default function VendorProfiles() {
 
                     <div className="grid gap-6 lg:grid-cols-[360px_1fr]">
                         <aside className="h-fit overflow-hidden rounded-3xl border border-white/70 bg-white/90 shadow-xl shadow-slate-200/70 backdrop-blur">
-                            <div className="h-32 bg-[radial-gradient(circle_at_top_left,_rgba(16,185,129,0.35),_transparent_35%),radial-gradient(circle_at_top_right,_rgba(59,130,246,0.28),_transparent_38%),linear-gradient(135deg,_#0f172a,_#064e3b)]" />
+                            <div className="relative h-36 bg-slate-950">
+                                {bannerPreview ? (
+                                    <img
+                                        src={bannerPreview}
+                                        alt="Store banner"
+                                        className="h-full w-full object-cover"
+                                    />
+                                ) : (
+                                    <div className="h-full bg-[radial-gradient(circle_at_top_left,_rgba(16,185,129,0.35),_transparent_35%),radial-gradient(circle_at_top_right,_rgba(59,130,246,0.28),_transparent_38%),linear-gradient(135deg,_#0f172a,_#064e3b)]" />
+                                )}
 
-                            <div className="-mt-10 px-6 pb-6">
-                                <div className="flex h-20 w-20 items-center justify-center rounded-3xl border-4 border-white bg-slate-950 text-2xl font-black text-white shadow-lg">
-                                    S
+                                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/45 to-transparent" />
+                            </div>
+
+                            <div className="-mt-12 px-6 pb-6">
+                                <div className="relative flex h-24 w-24 items-center justify-center overflow-hidden rounded-3xl border-4 border-white bg-slate-950 text-2xl font-black text-white shadow-lg">
+                                    {logoPreview ? (
+                                        <img
+                                            src={logoPreview}
+                                            alt="Store logo"
+                                            className="h-full w-full object-cover"
+                                        />
+                                    ) : (
+                                        <span>
+                                            {(data.store_name ?? 'S').charAt(0).toUpperCase()}
+                                        </span>
+                                    )}
                                 </div>
 
                                 <h2 className="mt-4 text-xl font-black text-slate-950">
-                                    Store Name
+                                    {data.store_name ?? 'Store Name'}
                                 </h2>
                                 <p className="mt-1 text-sm font-medium text-slate-500">
-                                    shopx-store
+                                    {data.store_slug ?? 'shopx-store'}
                                 </p>
 
                                 <div className="mt-4 flex flex-wrap gap-2">
-                                    <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700 ring-1 ring-inset ring-emerald-200">
-                                        Active
-                                    </span>
+                                    {status === 'active' ? (
+                                        <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold capitalize text-emerald-700 ring-1 ring-inset ring-emerald-200">
+                                            {status}
+                                        </span>
+                                    ) : (
+                                        <span className="rounded-full bg-red-50 px-3 py-1 text-xs font-bold capitalize text-red-700 ring-1 ring-inset ring-red-200">
+                                            {status}
+                                        </span>
+                                    )}
+                                    
                                     <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-bold text-amber-700 ring-1 ring-inset ring-amber-200">
-                                        Unverified
+                                        {verificationStatus}
                                     </span>
                                 </div>
 
@@ -169,7 +256,7 @@ export default function VendorProfiles() {
                                     <input
                                         type="file"
                                         accept="image/*"
-                                        onChange={(e) => setData('store_logo', e.target.files?.[0] ?? null)}
+                                        onChange={(e) => handleLogoChange(e.target.files?.[0] ?? null)}
                                         className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm file:mr-4 file:rounded-xl file:border-0 file:bg-slate-950 file:px-4 file:py-2 file:text-sm file:font-bold file:text-white hover:file:bg-slate-800"
                                     />
                                     {errors.store_logo && (
@@ -184,7 +271,7 @@ export default function VendorProfiles() {
                                     <input
                                         type="file"
                                         accept="image/*"
-                                        onChange={(e) => setData('store_banner', e.target.files?.[0] ?? null)}
+                                        onChange={(e) => handleBannerChange(e.target.files?.[0] ?? null)}
                                         className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm file:mr-4 file:rounded-xl file:border-0 file:bg-slate-950 file:px-4 file:py-2 file:text-sm file:font-bold file:text-white hover:file:bg-slate-800"
                                     />
                                     {errors.store_banner && (
@@ -199,7 +286,7 @@ export default function VendorProfiles() {
                                         </label>
                                         <input
                                             type="text"
-                                            value={data.store_name}
+                                            value={data.store_name ?? ''}
                                             onChange={(e) => setStoreSlug(e.target.value)}
                                             className="mt-2 w-full rounded-2xl border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm focus:border-emerald-500 focus:ring-emerald-500"
                                             placeholder="Enter store name"

@@ -5,7 +5,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class VendorDetailsModel extends Model
+class VendorProfilesModel extends Model
 {
     protected $table = 'vendor_profiles';
 

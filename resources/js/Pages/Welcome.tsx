@@ -53,12 +53,11 @@ const getDashboardRoute = () => {
     }
 };
 
-
     return (
         <>
             <Head title="Shop Smart - Home" />
 
-            <div className="min-h-screen bg-white text-gray-800 dark:bg-black dark:text-white">
+            <div className="min-h-screen bg-white text-gray-800 dark:text-white">
 
                 <header className="sticky top-0 z-30 border-b border-white/70 bg-white/80 shadow-sm shadow-slate-200/60 backdrop-blur-xl">
                     <div className="mx-auto flex h-20 max-w-7xl items-center gap-4 px-4 sm:px-6 lg:px-8">
