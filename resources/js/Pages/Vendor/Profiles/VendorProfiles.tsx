@@ -216,24 +216,23 @@ export default function VendorProfiles({
                                     </span>
                                 </div>
 
-                                <div className="mt-6 grid grid-cols-2 gap-3">
-                                    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                                        <p className="text-xs font-bold uppercase tracking-wide text-slate-400">
-                                            Products
-                                        </p>
-                                        <p className="mt-1 text-2xl font-black text-slate-950">
-                                            0
-                                        </p>
-                                    </div>
+                                <div className="mt-4 flex flex-wrap gap-2">
+                                    {vendorDetails?.store_description 
+ && (
+                                        <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700 ring-1 ring-inset ring-blue-200">
+                                            {vendorDetails.store_description.length > 50
+                                                ? vendorDetails.store_description.slice(0, 50) + '...'
+                                                : vendorDetails.store_description}
+                                        </span>
+                                    )}
+                                </div>
 
-                                    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                                        <p className="text-xs font-bold uppercase tracking-wide text-slate-400">
-                                            Orders
+                                <div className="mt-4 flex flex-wrap gap-2">
+                                    {vendorDetails?.verification_remarks && (
+                                        <p className="text-sm italic text-red-600">
+                                            Remarks: {vendorDetails.verification_remarks}
                                         </p>
-                                        <p className="mt-1 text-2xl font-black text-slate-950">
-                                            0
-                                        </p>
-                                    </div>
+                                    )}
                                 </div>
                             </div>
                         </aside>
