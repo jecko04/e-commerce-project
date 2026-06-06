@@ -8,6 +8,7 @@ use App\Http\Controllers\Vendor\AddProductController;
 use App\Http\Controllers\Vendor\VendorProductController;
 use App\Http\Controllers\Vendor\InventoryController;
 use App\Http\Controllers\Vendor\VendorViewProductController;
+use App\Http\Controllers\Vendor\Profiles\VendorProfilesController;
 use App\Http\Controllers\WelcomeController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -43,6 +44,9 @@ Route::middleware(['auth', 'role:vendor', 'verified'])->prefix('vendor')->group(
     Route::get('/view-products/{slug}', [VendorViewProductController::class, 'show'])->name('vendor.view-products.show');
     Route::patch('view-products/{product}', [VendorViewProductController::class, 'update'])->name('vendor.view-products.update');
     Route::patch('inventory/{product}', [InventoryController::class, 'update'])->name('vendor.inventory.update');
+
+    Route::get('/profile', [VendorProfilesController::class, 'edit'])->name('vendor.profile');
+    Route::patch('/profile', [VendorProfilesController::class, 'update'])->name('vendor.profile.update');
 });
 
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');

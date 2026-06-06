@@ -10,7 +10,21 @@ export default function Authenticated({
     header,
     children,
 }: PropsWithChildren<{ header?: ReactNode }>) {
+    
     const user = usePage().props.auth.user;
+
+    const getProfiles = () => {
+    if (!user) return route('login');
+
+        switch (user.role) {
+            case 'vendor':
+                return route('vendor.profile');
+            case 'admin':
+                return route('admin.profile');
+            default:
+                return route('home'); 
+        }
+    };
 
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
@@ -73,11 +87,27 @@ export default function Authenticated({
                                     </Dropdown.Trigger>
 
                                     <Dropdown.Content>
-                                        <Dropdown.Link
-                                            href={route('profile.edit')}
-                                        >
-                                            Profile
-                                        </Dropdown.Link>
+                                        {user.role === 'vendor' && (
+                                            <Dropdown.Link
+                                                href={route('vendor.profile')}
+                                            >
+                                                Vendor Profile
+                                            </Dropdown.Link>
+                                        )}
+                                        {user.role === 'admin' && (
+                                            <Dropdown.Link
+                                                href={route('admin.profile')}
+                                            >
+                                                Admin Profile
+                                            </Dropdown.Link>
+                                        )}
+                                        {user.role === 'client' && (
+                                            <Dropdown.Link
+                                                href={route('profile.edit')}
+                                            >
+                                                Client Profile
+                                            </Dropdown.Link>
+                                        )}
                                         <Dropdown.Link
                                             href={route('logout')}
                                             method="post"
