@@ -30,12 +30,14 @@ class VendorViewProductController extends Controller
                 'status' => ['required', 'in:active,inactive,draft,out_of_stock'],
                 'price' => ['required', 'numeric', 'min:0'],
                 'sale_price' => ['nullable', 'numeric', 'min:0', 'lt:price'],
+                'is_featured' => ['required', 'boolean'],
             ]);
 
             $product->update([
                 'status' => $validated['status'],
                 'price' => $validated['price'],
                 'sale_price' => $validated['sale_price'] ?? null,
+                'is_featured' => $validated['is_featured'],
             ]);
 
         

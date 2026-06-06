@@ -21,6 +21,7 @@ type Product = {
     sale_price?: string | number | null;
     stock_quantity: number;
     status: string;
+    is_featured: boolean;
     thumbnail?: string | null;
     category?: Category | null;
 };
@@ -68,6 +69,7 @@ export default function VendorViewProduct({
         status: product.status,
         price: String(product.price ?? ''),
         sale_price: String(product.sale_price ?? ''),
+        is_featured: Boolean(product.is_featured),
     });
 
     const closeModal = () => {
@@ -336,6 +338,44 @@ export default function VendorViewProduct({
                                 {errors.sale_price && (
                                     <p className="mt-2 text-sm font-medium text-red-600">
                                         {errors.sale_price}
+                                    </p>
+                                )}
+                            </div>
+
+                            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                                <div className="flex items-center justify-between gap-4">
+                                    <div>
+                                        <label
+                                            htmlFor="is_featured"
+                                            className="text-sm font-bold text-slate-700"
+                                        >
+                                            Featured product
+                                        </label>
+                                        <p className="mt-1 text-sm text-slate-500">
+                                            Show this item in the featured products section.
+                                        </p>
+                                    </div>
+
+                                    <button
+                                        type="button"
+                                        id="is_featured"
+                                        onClick={() => setData('is_featured', !data.is_featured)}
+                                        className={`relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition ${
+                                            data.is_featured ? 'bg-emerald-500' : 'bg-slate-300'
+                                        }`}
+                                        aria-pressed={data.is_featured}
+                                    >
+                                        <span
+                                            className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition ${
+                                                data.is_featured ? 'translate-x-6' : 'translate-x-1'
+                                            }`}
+                                        />
+                                    </button>
+                                </div>
+
+                                {errors.is_featured && (
+                                    <p className="mt-2 text-sm font-medium text-red-600">
+                                        {errors.is_featured}
                                     </p>
                                 )}
                             </div>

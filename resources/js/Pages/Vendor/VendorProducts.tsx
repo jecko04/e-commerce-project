@@ -18,6 +18,7 @@ type Product = {
     sale_price?: string | number | null;
     stock_quantity: number;
     status: string;
+    is_featured: boolean;
     thumbnail?: string | null;
     category_id?: number | null;
     category?: Category | null;
@@ -98,6 +99,7 @@ export default function VendorProducts({
                     const isLowStock =
                         product.stock_quantity > 0 && product.stock_quantity <= 10;
                     const isOutOfStock = product.stock_quantity <= 0;
+                    const isFeatured = Boolean(product.is_featured);
 
                     return (
                         <Link
@@ -125,6 +127,12 @@ export default function VendorProducts({
                                             Sale
                                         </span>
                                     )}
+
+                                    {isFeatured && (
+                                        <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700 ring-1 ring-inset ring-emerald-200">
+                                            Featured
+                                        </span>
+                                    )}  
 
                                     {isOutOfStock ? (
                                         <span className="rounded-full bg-red-50 px-2.5 py-1 text-xs font-bold text-red-700 ring-1 ring-inset ring-red-200">

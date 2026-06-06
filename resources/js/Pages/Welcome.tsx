@@ -16,6 +16,7 @@ type Product = {
     sale_price?: string | number | null;
     stock_quantity: number;
     status: string;
+    is_featured: boolean;
     thumbnail?: string | null;
     category?: Category | null;
 };
@@ -48,6 +49,7 @@ const getDashboardRoute = () => {
             return route('home'); 
     }
 };
+
 
     return (
         <>
@@ -128,44 +130,130 @@ const getDashboardRoute = () => {
                     <div className="rounded-2xl bg-gradient-to-tr from-red-500 to-orange-400 h-72 md:h-96 shadow-lg"></div>
                 </section>
 
-                {/* CATEGORIES */}
-                <section id="categories" className="max-w-7xl mx-auto px-6 py-12">
-                    <h3 className="text-2xl font-semibold mb-6">Categories</h3>
+                {categories.length > 0 && (
+                    <section id="categories" className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+                        <div className="mb-5">
+                            <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-600">
+                                Browse
+                            </p>
+                            <h3 className="mt-1 text-xl font-black text-slate-950">
+                                Categories
+                            </h3>
+                        </div>
 
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        {['Electronics', 'Fashion', 'Home', 'Gaming'].map((cat) => (
-                            <div
-                                key={cat}
-                                className="p-6 rounded-xl border hover:shadow-lg transition"
-                            >
-                                <p className="font-medium">{cat}</p>
+                        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+                            {categories.map((category) => (
+                                <a
+                                    key={category.id}
+                                    href={`#category-${category.id}`}
+                                    className="group rounded-2xl border border-slate-200 bg-white px-3 py-4 text-center shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-lg"
+                                >
+                                    <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-sm font-black uppercase text-emerald-700 transition group-hover:bg-emerald-100">
+                                        {category.name.charAt(0)}
+                                    </div>
+
+                                    <p className="truncate text-xs font-bold text-slate-700 transition group-hover:text-emerald-700">
+                                        {category.name}
+                                    </p>
+                                </a>
+                            ))}
+                        </div>
+                    </section>
+                )}
+
+                {products.filter((product) => product.is_featured && product.status === 'active').length > 0 && (
+                    <section id="products" className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+                        <div className="mb-5 flex items-end justify-between gap-4">
+                            <div>
+                                <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-600">
+                                    Featured
+                                </p>
+                                <h3 className="mt-1 text-xl font-black text-slate-950">
+                                    Featured Products
+                                </h3>
                             </div>
-                        ))}
-                    </div>
-                </section>
+                        </div>
 
-                {/* PRODUCTS */}
-                <section id="products" className="max-w-7xl mx-auto px-6 py-12">
-                    <h3 className="text-2xl font-semibold mb-6">Featured Products</h3>
+                        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6">
+                            {products
+                                .filter((product) => product.is_featured && product.status === 'active')
+                                .map((featuredProduct) => {
+                                    const hasSale = Boolean(featuredProduct.sale_price);
+                                    const isLowStock =
+                                        featuredProduct.stock_quantity > 0 &&
+                                        featuredProduct.stock_quantity <= 10;
+                                    const isOutOfStock = featuredProduct.stock_quantity <= 0;
 
-                    <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {[1, 2, 3, 4].map((item) => (
-                            <div
-                                key={item}
-                                className="border rounded-xl p-4 hover:shadow-lg transition"
-                            >
-                                <div className="h-40 bg-gray-100 dark:bg-zinc-800 rounded-lg"></div>
+                                    return (
+                                        <div
+                                            key={featuredProduct.id}
+                                            className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-lg"
+                                        >
+                                            <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
+                                                {featuredProduct.thumbnail ? (
+                                                    <img
+                                                        src={`/storage/${featuredProduct.thumbnail}`}
+                                                        alt={featuredProduct.name}
+                                                        className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                                                    />
+                                                ) : (
+                                                    <div className="flex h-full items-center justify-center text-[11px] font-semibold text-slate-400">
+                                                        No Image
+                                                    </div>
+                                                )}
 
-                                <h4 className="mt-4 font-semibold">Product Name</h4>
-                                <p className="text-sm text-gray-500">₱1,999.00</p>
+                                                <div className="absolute left-2 top-2 flex flex-wrap gap-1.5">
+                                                    {hasSale && (
+                                                        <span className="rounded-full bg-red-600 px-2 py-0.5 text-[10px] font-bold text-white shadow-sm">
+                                                            Sale
+                                                        </span>
+                                                    )}
+                                                </div>
 
-                                <button className="mt-3 w-full bg-red-500 text-white py-2 rounded-lg hover:bg-red-600">
-                                    Add to Cart
-                                </button>
-                            </div>
-                        ))}
-                    </div>
-                </section>
+                                                <div className="absolute bottom-2 right-2 rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-bold text-slate-700 shadow-sm backdrop-blur">
+                                                    {featuredProduct.stock_quantity} left
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-2 p-3">
+                                                <div>
+                                                    <h4 className="line-clamp-2 min-h-[2rem] text-xs font-bold leading-4 text-slate-950 group-hover:text-emerald-700">
+                                                        {featuredProduct.name}
+                                                    </h4>
+
+                                                    <p className="mt-1 truncate text-[11px] font-medium text-slate-500">
+                                                        {featuredProduct.category?.name ?? 'Featured item'}
+                                                    </p>
+                                                </div>
+
+                                                <div>
+                                                    {hasSale ? (
+                                                        <>
+                                                            <p className="truncate text-sm font-black text-red-600">
+                                                                ₱{featuredProduct.sale_price}
+                                                            </p>
+                                                            <p className="truncate text-[11px] font-medium text-slate-400 line-through">
+                                                                ₱{featuredProduct.price}
+                                                            </p>
+                                                        </>
+                                                    ) : (
+                                                        <p className="truncate text-sm font-black text-slate-950">
+                                                            ₱{featuredProduct.price}
+                                                        </p>
+                                                    )}
+                                                </div>
+
+                                                <button className="w-full rounded-xl bg-slate-950 px-3 py-2 text-xs font-bold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60">
+                                                    {isOutOfStock ? 'Unavailable' : 'Add to Cart'}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                        </div>
+                    </section>
+                )}
+                
 
                 {/* FOOTER */}
                 <footer className="border-t mt-16 py-10 text-center text-sm text-gray-500">
