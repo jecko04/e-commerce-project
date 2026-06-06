@@ -6,25 +6,42 @@ import { Link, usePage } from '@inertiajs/react';
 import { PropsWithChildren, ReactNode, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 
+type VendorProfiles = {
+    store_name: string;
+    store_logo: string | null;
+}
+
+type PageProps = {
+    auth: {
+        user: {
+            id: number;
+            name: string;
+            email: string;
+            role: string;
+        };
+    };
+    vendorProfile: VendorProfiles | null;
+};
+
 export default function Authenticated({
     header,
     children,
-}: PropsWithChildren<{ header?: ReactNode }>) {
+}: PropsWithChildren<{ header?: ReactNode}>) {
     
-    const user = usePage().props.auth.user;
+    const { auth, vendorProfile } = usePage<PageProps>().props;
+    const user = auth.user;
 
-    // const getProfiles = () => {
-    // if (!user) return route('login');
+    const brandName =
+        user.role === 'vendor' && vendorProfile?.store_name
+            ? vendorProfile.store_name
+            : 'ShopX';
 
-    //     switch (user.role) {
-    //         case 'vendor':
-    //             return route('vendor.profile');
-    //         case 'admin':
-    //             return route('admin.profile');
-    //         default:
-    //             return route('home'); 
-    //     }
-    // };
+    const brandInitial = brandName.charAt(0).toUpperCase();
+
+    const brandLogo =
+        user.role === 'vendor' && vendorProfile?.store_logo
+            ? `/storage/${vendorProfile.store_logo}`
+            : null;
 
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
@@ -42,7 +59,7 @@ export default function Authenticated({
                                 className="flex items-center gap-3 rounded-xl transition hover:opacity-80"
                             >
                                 <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-950 text-white shadow-lg shadow-slate-900/20">
-                                    <ApplicationLogo className="block h-6 w-auto fill-current" />
+                                    X
                                 </span>
                                 <span className="hidden sm:block">
                                     <span className="block text-base font-bold tracking-tight text-slate-950">
@@ -57,61 +74,114 @@ export default function Authenticated({
                         </div>
 
                         <div className="hidden sm:flex sm:items-center">
+                            <button
+                                type="button"
+                                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700"
+                                aria-label="Notifications"
+                            >
+                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9a6 6 0 0 0-12 0v.75a8.967 8.967 0 0 1-2.312 6.022 23.848 23.848 0 0 0 5.455 1.31m5.714 0a3 3 0 0 1-5.714 0" />
+                                </svg>
+                            </button>
                             <div className="relative ms-3">
+                                
                                 <Dropdown>
                                     <Dropdown.Trigger>
-                                        <span className="inline-flex rounded-full">
-                                            <button
-                                                type="button"
-                                                className="inline-flex items-center gap-3 rounded-full border border-slate-200 bg-white px-3 py-2 text-sm font-semibold leading-4 text-slate-700 shadow-sm transition duration-150 ease-in-out hover:border-slate-300 hover:bg-slate-50 hover:text-slate-950 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
-                                            >
-                                                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-sky-500 text-xs font-bold uppercase text-white">
-                                                    {user.name.charAt(0)}
-                                                </span>
-                                                <span>{user.name}</span>
-
-                                                <svg
-                                                    className="h-4 w-4 text-slate-400"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    viewBox="0 0 20 20"
-                                                    fill="currentColor"
-                                                >
-                                                    <path
-                                                        fillRule="evenodd"
-                                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                                        clipRule="evenodd"
+                                       
+                                        <button
+                                            type="button"
+                                            className="inline-flex items-center gap-3 rounded-full border border-slate-200 bg-white px-2 py-1 text-left shadow-sm transition hover:border-slate-300 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                                        >
+                                            <span className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-slate-950 text-sm font-black uppercase text-white shadow-sm">
+                                                {brandLogo ? (
+                                                    <img
+                                                        src={brandLogo}
+                                                        alt={brandName}
+                                                        className="h-full w-full object-cover"
                                                     />
-                                                </svg>
-                                            </button>
-                                        </span>
+                                                ) : (
+                                                    brandInitial
+                                                )}
+                                            </span>
+
+                                            <span className="hidden sm:block">
+                                                <span className="block max-w-28 truncate text-base tracking-tight text-slate-600">
+                                                    {brandName ? (
+                                                        <p>{brandName}</p>
+                                                    ) : (
+                                                        <></>
+                                                    )}
+                                                </span>
+                                            </span>
+
+
+                                            <svg
+                                                className="h-4 w-4 text-slate-400"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                viewBox="0 0 20 20"
+                                                fill="currentColor"
+                                            >
+                                                <path
+                                                    fillRule="evenodd"
+                                                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                                    clipRule="evenodd"
+                                                />
+                                            </svg>
+                                        </button>
                                     </Dropdown.Trigger>
 
-                                    <Dropdown.Content>
+                                    <Dropdown.Content
+                                        align="right"
+                                        contentClasses="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl shadow-slate-200/80"
+                                    >
+                                        <div className="border-b border-slate-100 px-4 py-3">
+                                            <div className="flex items-center gap-3">
+                                                <span className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-slate-950 text-sm font-black uppercase text-white">
+                                                    {brandLogo ? (
+                                                        <img
+                                                            src={brandLogo}
+                                                            alt={brandName}
+                                                            className="h-full w-full object-cover"
+                                                        />
+                                                    ) : (
+                                                        brandInitial
+                                                    )}
+                                                </span>
+
+                                                <div className="min-w-0">
+                                                    <p className="truncate text-sm font-bold text-slate-950">
+                                                        {brandName}
+                                                    </p>
+                                                    <p className="truncate text-xs font-medium text-slate-500">
+                                                        {user.email}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                         {user.role === 'vendor' && (
-                                            <Dropdown.Link
-                                                href={route('vendor.profile')}
-                                            >
+                                            <Dropdown.Link href={route('vendor.profile')}>
                                                 Vendor Profile
                                             </Dropdown.Link>
                                         )}
+
                                         {user.role === 'admin' && (
-                                            <Dropdown.Link
-                                                href={route('admin.profile')}
-                                            >
+                                            <Dropdown.Link href={route('admin.profile')}>
                                                 Admin Profile
                                             </Dropdown.Link>
                                         )}
+
                                         {user.role === 'client' && (
-                                            <Dropdown.Link
-                                                href={route('profile.edit')}
-                                            >
+                                            <Dropdown.Link href={route('profile.edit')}>
                                                 Client Profile
                                             </Dropdown.Link>
                                         )}
+
                                         <Dropdown.Link
                                             href={route('logout')}
                                             method="post"
                                             as="button"
+                                            className="block w-full px-4 py-3 text-left text-sm font-semibold text-red-600 transition hover:bg-red-50"
                                         >
                                             Log Out
                                         </Dropdown.Link>
@@ -164,44 +234,69 @@ export default function Authenticated({
                     </div>
                 </div>
 
-                <div
+               <div
                     className={
                         (showingNavigationDropdown ? 'block' : 'hidden') +
-                        ' border-t border-slate-100 bg-white/95 pb-4 shadow-lg shadow-slate-200/60 sm:hidden'
+                        ' border-t border-slate-100 bg-white/95 px-4 pb-4 pt-3 shadow-lg shadow-slate-200/60 sm:hidden'
                     }
                 >
-                    <div className="space-y-1 px-4 pb-3 pt-4">
-                        <ResponsiveNavLink
-                            href={route('home')}
-                            active={route().current('home')}
-                        >
-                            ShopX
-                        </ResponsiveNavLink>
-                    </div>
+                    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl shadow-slate-200/80">
+                        <div className="border-b border-slate-100 px-4 py-3">
+                            <div className="flex items-center gap-3">
+                                <span className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-slate-950 text-sm font-black uppercase text-white">
+                                    {brandLogo ? (
+                                        <img
+                                            src={brandLogo}
+                                            alt={brandName}
+                                            className="h-full w-full object-cover"
+                                        />
+                                    ) : (
+                                        brandInitial
+                                    )}
+                                </span>
 
-                    <div className="mx-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                        <div className="flex items-center gap-3">
-                            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-sky-500 text-sm font-bold uppercase text-white">
-                                {user.name.charAt(0)}
-                            </div>
-                            <div>
-                                <div className="text-base font-semibold text-slate-950">
-                                    {user.name}
-                                </div>
-                                <div className="text-sm font-medium text-slate-500">
-                                    {user.email}
+                                <div className="min-w-0">
+                                    <p className="truncate text-sm font-bold text-slate-950">
+                                        {brandName}
+                                    </p>
+                                    <p className="truncate text-xs font-medium text-slate-500">
+                                        {user.email}
+                                    </p>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="mt-4 space-y-1">
-                            <ResponsiveNavLink href={route('profile.edit')}>
-                                Profile
+                        <div className="py-1">
+                            <ResponsiveNavLink
+                                href={route('home')}
+                                active={route().current('home')}
+                            >
+                                ShopX
                             </ResponsiveNavLink>
+
+                            {user.role === 'vendor' && (
+                                <ResponsiveNavLink href={route('vendor.profile')}>
+                                    Vendor Profile
+                                </ResponsiveNavLink>
+                            )}
+
+                            {user.role === 'admin' && (
+                                <ResponsiveNavLink href={route('admin.profile')}>
+                                    Admin Profile
+                                </ResponsiveNavLink>
+                            )}
+
+                            {user.role === 'client' && (
+                                <ResponsiveNavLink href={route('profile.edit')}>
+                                    Client Profile
+                                </ResponsiveNavLink>
+                            )}
+
                             <ResponsiveNavLink
                                 method="post"
                                 href={route('logout')}
                                 as="button"
+                                className="block w-full px-4 py-3 text-left text-sm font-semibold text-red-600 transition hover:bg-red-50"
                             >
                                 Log Out
                             </ResponsiveNavLink>
