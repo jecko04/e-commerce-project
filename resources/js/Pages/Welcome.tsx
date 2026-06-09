@@ -1,6 +1,12 @@
-import { PageProps } from '@/types';
+import Dropdown from '@/Components/Dropdown';
+import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { Head, Link } from '@inertiajs/react';
 import { useState } from 'react';
+
+type VendorProfiles = {
+    store_name: string;
+    store_logo: string | null;
+};
 
 type Category = {
     id: number;
@@ -23,42 +29,48 @@ type Product = {
 };
 
 type Props = {
-    auth: PageProps['auth'];
+    auth: {
+        user: {
+            id: number;
+            name: string;
+            email: string;
+            role: string;
+        } | null;
+    };
     categories: Category[];
     products: Product[];
+    featuredProducts: Product[];
+    vendorProfile: VendorProfiles | null;
 };
-
 
 export default function Welcome({
     auth,
     categories,
-    products
+    featuredProducts,
+    vendorProfile,
 }: Props) {
+    const [showingNavigationDropdown, setShowingNavigationDropdown] =
+        useState(false);
 
-    const [showProfileMenu, setShowProfileMenu] = useState(false);
+    const user = auth.user;
 
+    const brandName =
+        user?.role === 'vendor' && vendorProfile?.store_name
+            ? vendorProfile.store_name
+            : 'ShopX';
 
-const getDashboardRoute = () => {
-    if (!auth.user) return route('login');
+    const brandInitial = brandName.charAt(0).toUpperCase();
 
-    switch (auth.user.role) {
-        case 'client':
-            return route('dashboard');
-        case 'vendor':
-            return route('vendor.dashboard');
-        case 'admin':
-            return route('admin.dashboard');
-        default:
-            return route('home'); 
-    }
-};
+    const brandLogo =
+        user?.role === 'vendor' && vendorProfile?.store_logo
+            ? `/storage/${vendorProfile.store_logo}`
+            : null;
 
     return (
         <>
             <Head title="Shop Smart - Home" />
 
             <div className="min-h-screen bg-white text-gray-800 dark:text-white">
-
                 <header className="sticky top-0 z-30 border-b border-white/70 bg-white/80 shadow-sm shadow-slate-200/60 backdrop-blur-xl">
                     <div className="mx-auto flex h-20 max-w-7xl items-center gap-4 px-4 sm:px-6 lg:px-8">
                         <Link href="/" className="flex shrink-0 items-center gap-3">
@@ -102,7 +114,7 @@ const getDashboardRoute = () => {
                         <nav className="ml-auto flex items-center gap-2">
                             <button
                                 type="button"
-                                className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700"
+                                className="hidden h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700 sm:inline-flex"
                                 aria-label="Notifications"
                             >
                                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
@@ -110,77 +122,153 @@ const getDashboardRoute = () => {
                                 </svg>
                             </button>
 
-                            <Link
-                                href="#cart"
-                                className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700"
-                                aria-label="Cart"
-                            >
-                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386a1.5 1.5 0 0 1 1.463 1.175l.383 1.725M7.5 14.25h9.75a1.5 1.5 0 0 0 1.463-1.175l1.087-4.9A1.5 1.5 0 0 0 18.337 6.3H5.482m2.018 7.95L6.15 8.175m1.35 6.075L6.75 17.25h10.5M9 20.25h.008v.008H9v-.008Zm7.5 0h.008v.008H16.5v-.008Z" />
-                                </svg>
-                            </Link>
-
-                            <div className="relative">
-                                <button
-                                    type="button"
-                                    onClick={() => setShowProfileMenu((open) => !open)}
-                                    className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-slate-950 text-sm font-bold uppercase text-white shadow-lg shadow-slate-900/20 transition hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
-                                    aria-label="Profile menu"
+                            {user?.role !== 'vendor' && (
+                                <Link
+                                    href="#cart"
+                                    className="hidden h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700 sm:inline-flex"
+                                    aria-label="Cart"
                                 >
-                                    {auth.user ? auth.user.name.charAt(0) : 'G'}
-                                </button>
+                                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386a1.5 1.5 0 0 1 1.463 1.175l.383 1.725M7.5 14.25h9.75a1.5 1.5 0 0 0 1.463-1.175l1.087-4.9A1.5 1.5 0 0 0 18.337 6.3H5.482m2.018 7.95L6.15 8.175m1.35 6.075L6.75 17.25h10.5M9 20.25h.008v.008H9v-.008Zm7.5 0h.008v.008H16.5v-.008Z" />
+                                    </svg>
+                                </Link>
+                            )}
 
-                                {showProfileMenu && (
-                                    <div className="absolute right-0 mt-3 w-56 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl shadow-slate-200/80">
-                                        {auth.user ? (
-                                            <>
-                                                <div className="border-b border-slate-100 px-4 py-3">
-                                                    <p className="text-sm font-bold text-slate-950">
-                                                        {auth.user.name}
-                                                    </p>
-                                                    <p className="truncate text-xs font-medium text-slate-500">
-                                                        {auth.user.email}
-                                                    </p>
-                                                </div>
+                            {user ? (
+                                <div className="hidden sm:block">
+                                    <Dropdown>
+                                        <Dropdown.Trigger>
+                                            <button
+                                                type="button"
+                                                className="inline-flex items-center gap-3 rounded-full border border-slate-200 bg-white px-2 py-1 text-left shadow-sm transition hover:border-slate-300 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                                            >
+                                                <span className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-slate-950 text-sm font-black uppercase text-white shadow-sm">
+                                                    {brandLogo ? (
+                                                        <img src={brandLogo} alt={brandName} className="h-full w-full object-cover" />
+                                                    ) : (
+                                                        brandInitial
+                                                    )}
+                                                </span>
 
-                                                <Link
-                                                    href={getDashboardRoute()}
-                                                    className="block px-4 py-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 hover:text-emerald-700"
-                                                >
-                                                    Dashboard
-                                                </Link>
+                                                <span className="block max-w-28 truncate text-sm font-semibold text-slate-600">
+                                                    {brandName}
+                                                </span>
 
-                                                <Link
-                                                    href={route('logout')}
-                                                    method="post"
-                                                    as="button"
-                                                    className="block w-full px-4 py-3 text-left text-sm font-semibold text-red-600 transition hover:bg-red-50"
-                                                >
-                                                    Logout
-                                                </Link>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <Link
-                                                    href={route('login')}
-                                                    className="block px-4 py-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 hover:text-emerald-700"
-                                                >
-                                                    Login
-                                                </Link>
+                                                <svg className="h-4 w-4 text-slate-400" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path
+                                                        fillRule="evenodd"
+                                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                                        clipRule="evenodd"
+                                                    />
+                                                </svg>
+                                            </button>
+                                        </Dropdown.Trigger>
 
-                                                <Link
-                                                    href={route('register')}
-                                                    className="block px-4 py-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 hover:text-emerald-700"
-                                                >
-                                                    Sign up
-                                                </Link>
-                                            </>
-                                        )}
+                                        <Dropdown.Content
+                                            align="right"
+                                            contentClasses="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl shadow-slate-200/80"
+                                        >
+                                            <div className="border-b border-slate-100 px-4 py-3">
+                                                <p className="truncate text-sm font-bold text-slate-950">{brandName}</p>
+                                                <p className="truncate text-xs font-medium text-slate-500">{user.email}</p>
+                                            </div>
+
+                                            {user.role === 'vendor' && (
+                                                <Dropdown.Link href={route('vendor.profile')}>Vendor Profile</Dropdown.Link>
+                                            )}
+
+                                            {user.role === 'admin' && (
+                                                <Dropdown.Link href={route('admin.profile')}>Admin Profile</Dropdown.Link>
+                                            )}
+
+                                            {user.role === 'client' && (
+                                                <Dropdown.Link href={route('profile.edit')}>Client Profile</Dropdown.Link>
+                                            )}
+
+                                            <Dropdown.Link
+                                                href={route('logout')}
+                                                method="post"
+                                                as="button"
+                                                className="block w-full px-4 py-3 text-left text-sm font-semibold text-red-600 transition hover:bg-red-50"
+                                            >
+                                                Log Out
+                                            </Dropdown.Link>
+                                        </Dropdown.Content>
+                                    </Dropdown>
+                                </div>
+                            ) : (
+                                <div className="hidden items-center gap-2 sm:flex">
+                                    <Link href={route('login')} className="px-4 py-2 text-sm font-semibold text-slate-600 hover:text-emerald-700">
+                                        Login
+                                    </Link>
+                                    <Link href={route('register')} className="rounded-full bg-slate-950 px-4 py-2 text-sm font-bold text-white hover:bg-slate-800">
+                                        Sign up
+                                    </Link>
+                                </div>
+                            )}
+
+                            <button
+                                onClick={() => setShowingNavigationDropdown((open) => !open)}
+                                className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 sm:hidden"
+                                aria-label="Toggle navigation"
+                            >
+                                <svg className="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                                    <path
+                                        className={!showingNavigationDropdown ? 'inline-flex' : 'hidden'}
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth="2"
+                                        d="M4 6h16M4 12h16M4 18h16"
+                                    />
+                                    <path
+                                        className={showingNavigationDropdown ? 'inline-flex' : 'hidden'}
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth="2"
+                                        d="M6 18L18 6M6 6l12 12"
+                                    />
+                                </svg>
+                            </button>
+                        </nav>
+                    </div>
+
+                    {showingNavigationDropdown && (
+                        <div className="border-t border-slate-100 bg-white/95 px-4 pb-4 pt-3 shadow-lg shadow-slate-200/60 sm:hidden">
+                            <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl shadow-slate-200/80">
+                                {user ? (
+                                    <>
+                                        <div className="border-b border-slate-100 px-4 py-3">
+                                            <p className="truncate text-sm font-bold text-slate-950">{brandName}</p>
+                                            <p className="truncate text-xs font-medium text-slate-500">{user.email}</p>
+                                        </div>
+
+                                        <div className="py-1">
+                                            {user.role === 'vendor' && (
+                                                <ResponsiveNavLink href={route('vendor.dashboard')}>Vendor Dashboard</ResponsiveNavLink>
+                                            )}
+
+                                            {user.role === 'admin' && (
+                                                <ResponsiveNavLink href={route('admin.dashboard')}>Admin Dashboard</ResponsiveNavLink>
+                                            )}
+
+                                            {user.role === 'client' && (
+                                                <ResponsiveNavLink href={route('dashboard')}>Dashboard</ResponsiveNavLink>
+                                            )}
+
+                                            <ResponsiveNavLink method="post" href={route('logout')} as="button">
+                                                Log Out
+                                            </ResponsiveNavLink>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <div className="py-1">
+                                        <ResponsiveNavLink href={route('login')}>Login</ResponsiveNavLink>
+                                        <ResponsiveNavLink href={route('register')}>Sign up</ResponsiveNavLink>
                                     </div>
                                 )}
                             </div>
-                        </nav>
-                    </div>
+                        </div>
+                    )}
 
                     <div className="border-t border-slate-100 px-4 py-3 md:hidden">
                         <input
@@ -191,54 +279,13 @@ const getDashboardRoute = () => {
                     </div>
                 </header>
 
-                {/* HERO
-                <section className="max-w-7xl mx-auto px-6 py-20 grid md:grid-cols-2 gap-10 items-center">
-                    <div>
-                        <h2 className="text-4xl md:text-5xl font-bold leading-tight">
-                            Discover Products <br />
-                            That Fit Your Lifestyle
-                        </h2>
-
-                        <p className="mt-4 text-gray-600 dark:text-gray-300">
-                            Shop the latest trends, gadgets, and essentials all in one place.
-                            Fast delivery, secure payments, and trusted sellers.
-                        </p>
-
-                        <div className="mt-6 flex gap-4">
-                            <a
-                                href={route('products.index')}
-                                className="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600"
-                            >
-                                Shop Now
-                            </a>
-
-                            <a
-                                href="#categories"
-                                className="px-6 py-3 border rounded-lg hover:border-red-500"
-                            >
-                                Explore Categories
-                            </a>
-                        </div>
-                    </div>
-
-                    <div className="rounded-2xl bg-gradient-to-tr from-red-500 to-orange-400 h-72 md:h-96 shadow-lg"></div>
-                </section> */}
-
                 {categories.length > 0 && (
                     <section id="categories" className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
                         <div className="mb-5 flex items-end justify-between gap-4">
                             <div>
-                                <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-600">
-                                    Browse
-                                </p>
-                                <h3 className="mt-1 text-xl font-black text-slate-950">
-                                    Categories
-                                </h3>
+                                <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-600">Browse</p>
+                                <h3 className="mt-1 text-xl font-black text-slate-950">Categories</h3>
                             </div>
-
-                            <p className="hidden text-xs font-semibold text-slate-400 sm:block">
-                                Scroll to explore
-                            </p>
                         </div>
 
                         <div className="-mx-4 overflow-x-auto px-4 pb-2 snap-x snap-mandatory sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
@@ -252,7 +299,6 @@ const getDashboardRoute = () => {
                                         <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-sm font-black uppercase text-emerald-700 transition group-hover:bg-emerald-100">
                                             {category.name.charAt(0)}
                                         </div>
-
                                         <p className="truncate text-xs font-bold text-slate-700 transition group-hover:text-emerald-700">
                                             {category.name}
                                         </p>
@@ -263,102 +309,90 @@ const getDashboardRoute = () => {
                     </section>
                 )}
 
-                {products.filter((product) => product.is_featured && product.status === 'active').length > 0 && (
+                {featuredProducts.length > 0 && (
                     <section id="products" className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-                        <div className="mb-5 flex items-end justify-between gap-4">
-                            <div>
-                                <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-600">
-                                    Featured
-                                </p>
-                                <h3 className="mt-1 text-xl font-black text-slate-950">
-                                    Featured Products
-                                </h3>
-                            </div>
+                        <div className="mb-5">
+                            <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-600">Featured</p>
+                            <h3 className="mt-1 text-xl font-black text-slate-950">Featured Products</h3>
                         </div>
 
                         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6">
-                            {products
-                                .filter((product) => product.is_featured && product.status === 'active')
-                                .map((featuredProduct) => {
-                                    const hasSale = Boolean(featuredProduct.sale_price);
-                                    const isLowStock =
-                                        featuredProduct.stock_quantity > 0 &&
-                                        featuredProduct.stock_quantity <= 10;
-                                    const isOutOfStock = featuredProduct.stock_quantity <= 0;
+                            {featuredProducts.map((featuredProduct) => {
+                                const hasSale = Boolean(featuredProduct.sale_price);
+                                const isOutOfStock = featuredProduct.stock_quantity <= 0;
 
-                                    return (
-                                        <div
-                                            key={featuredProduct.id}
-                                            className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-lg"
-                                        >
-                                            <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
-                                                {featuredProduct.thumbnail ? (
-                                                    <img
-                                                        src={`/storage/${featuredProduct.thumbnail}`}
-                                                        alt={featuredProduct.name}
-                                                        className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
-                                                    />
-                                                ) : (
-                                                    <div className="flex h-full items-center justify-center text-[11px] font-semibold text-slate-400">
-                                                        No Image
-                                                    </div>
-                                                )}
-
-                                                <div className="absolute left-2 top-2 flex flex-wrap gap-1.5">
-                                                    {hasSale && (
-                                                        <span className="rounded-full bg-red-600 px-2 py-0.5 text-[10px] font-bold text-white shadow-sm">
-                                                            Sale
-                                                        </span>
-                                                    )}
+                                return (
+                                    <div
+                                        key={featuredProduct.id}
+                                        className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-lg"
+                                    >
+                                        <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
+                                            {featuredProduct.thumbnail ? (
+                                                <img
+                                                    src={`/storage/${featuredProduct.thumbnail}`}
+                                                    alt={featuredProduct.name}
+                                                    className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                                                />
+                                            ) : (
+                                                <div className="flex h-full items-center justify-center text-[11px] font-semibold text-slate-400">
+                                                    No Image
                                                 </div>
+                                            )}
 
-                                                <div className="absolute bottom-2 right-2 rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-bold text-slate-700 shadow-sm backdrop-blur">
-                                                    {featuredProduct.stock_quantity} left
-                                                </div>
-                                            </div>
+                                            {hasSale && (
+                                                <span className="absolute left-2 top-2 rounded-full bg-red-600 px-2 py-0.5 text-[10px] font-bold text-white shadow-sm">
+                                                    Sale
+                                                </span>
+                                            )}
 
-                                            <div className="space-y-2 p-3">
-                                                <div>
-                                                    <h4 className="line-clamp-2 min-h-[2rem] text-xs font-bold leading-4 text-slate-950 group-hover:text-emerald-700">
-                                                        {featuredProduct.name}
-                                                    </h4>
-
-                                                    <p className="mt-1 truncate text-[11px] font-medium text-slate-500">
-                                                        {featuredProduct.category?.name ?? 'Featured item'}
-                                                    </p>
-                                                </div>
-
-                                                <div>
-                                                    {hasSale ? (
-                                                        <>
-                                                            <p className="truncate text-sm font-black text-red-600">
-                                                                ₱{featuredProduct.sale_price}
-                                                            </p>
-                                                            <p className="truncate text-[11px] font-medium text-slate-400 line-through">
-                                                                ₱{featuredProduct.price}
-                                                            </p>
-                                                        </>
-                                                    ) : (
-                                                        <p className="truncate text-sm font-black text-slate-950">
-                                                            ₱{featuredProduct.price}
-                                                        </p>
-                                                    )}
-                                                </div>
-
-                                                <button className="w-full rounded-xl bg-slate-950 px-3 py-2 text-xs font-bold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60">
-                                                    {isOutOfStock ? 'Unavailable' : 'Add to Cart'}
-                                                </button>
+                                            <div className="absolute bottom-2 right-2 rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-bold text-slate-700 shadow-sm backdrop-blur">
+                                                {featuredProduct.stock_quantity} left
                                             </div>
                                         </div>
-                                    );
-                                })}
+
+                                        <div className="space-y-2 p-3">
+                                            <div>
+                                                <h4 className="line-clamp-2 min-h-[2rem] text-xs font-bold leading-4 text-slate-950 group-hover:text-emerald-700">
+                                                    {featuredProduct.name}
+                                                </h4>
+
+                                                <p className="mt-1 truncate text-[11px] font-medium text-slate-500">
+                                                    {featuredProduct.category?.name ?? 'Featured item'}
+                                                </p>
+                                            </div>
+
+                                            <div>
+                                                {hasSale ? (
+                                                    <>
+                                                        <p className="truncate text-sm font-black text-red-600">
+                                                            ₱{featuredProduct.sale_price}
+                                                        </p>
+                                                        <p className="truncate text-[11px] font-medium text-slate-400 line-through">
+                                                            ₱{featuredProduct.price}
+                                                        </p>
+                                                    </>
+                                                ) : (
+                                                    <p className="truncate text-sm font-black text-slate-950">
+                                                        ₱{featuredProduct.price}
+                                                    </p>
+                                                )}
+                                            </div>
+
+                                            <button
+                                                disabled={isOutOfStock}
+                                                className="w-full rounded-xl bg-slate-950 px-3 py-2 text-xs font-bold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+                                            >
+                                                {isOutOfStock ? 'Unavailable' : 'Add to Cart'}
+                                            </button>
+                                        </div>
+                                    </div>
+                                );
+                            })}
                         </div>
                     </section>
                 )}
-                
 
-                {/* FOOTER */}
-                <footer className="border-t mt-16 py-10 text-center text-sm text-gray-500">
+                <footer className="mt-16 border-t py-10 text-center text-sm text-gray-500">
                     © {new Date().getFullYear()} ShopX. All rights reserved.
                 </footer>
             </div>

@@ -26,5 +26,8 @@ class VendorProfilesModel extends Model
         'warehouse_address',
         'contact_person',
         'contact_number',
+        'status',
+        'verification_status',
+        'verification_remarks'
     ];
 }
