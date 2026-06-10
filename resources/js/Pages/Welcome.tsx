@@ -174,15 +174,15 @@ export default function Welcome({
                                             </div>
 
                                             {user.role === 'vendor' && (
-                                                <Dropdown.Link href={route('vendor.profile')}>Vendor Profile</Dropdown.Link>
+                                                <Dropdown.Link href={route('vendor.dashboard')}>Vendor Dashboard</Dropdown.Link>
                                             )}
 
                                             {user.role === 'admin' && (
-                                                <Dropdown.Link href={route('admin.profile')}>Admin Profile</Dropdown.Link>
+                                                <Dropdown.Link href={route('admin.dashboard')}>Admin Dashboard</Dropdown.Link>
                                             )}
 
                                             {user.role === 'client' && (
-                                                <Dropdown.Link href={route('profile.edit')}>Client Profile</Dropdown.Link>
+                                                <Dropdown.Link href={route('dashboard')}>Dashboard</Dropdown.Link>
                                             )}
 
                                             <Dropdown.Link

@@ -43,11 +43,6 @@ export default function Register() {
                         <h1 className="mt-3 text-2xl font-bold tracking-tight text-slate-950">
                             Create your account
                         </h1>
-
-                        <p className="mt-2 text-sm leading-6 text-slate-500">
-                            Join ShopX to start managing your store, products,
-                            and orders.
-                        </p>
                     </div>
 
                     <form onSubmit={submit} className="space-y-5">
