@@ -37,29 +37,36 @@ export default function Authenticated({
     const { auth, vendorProfile, userProfile } = usePage<PageProps>().props;
     const user = auth.user;
 
-    const brandName =
-        user.role === 'vendor' && vendorProfile?.store_name
-            ? vendorProfile.store_name
-            : '';
+    let displayName = '';
+    let displayInitial = '';
+    let displayImage = null;
 
-    const brandInitial = brandName.charAt(0).toUpperCase();
+    switch (user.role) {
+        case 'vendor':
+            displayName = vendorProfile?.store_name || 'ShopX';
+            displayImage = vendorProfile?.store_logo
+                ? `/storage/${vendorProfile.store_logo}`
+                : null;
+            break;
 
-    const brandLogo =
-        user.role === 'vendor' && vendorProfile?.store_logo
-            ? `/storage/${vendorProfile.store_logo}`
-            : null;
+        case 'client':
+            displayName = userProfile?.nickname || 'User';
+            displayImage = userProfile?.profile_photo
+                ? `/storage/${userProfile.profile_photo}`
+                : null;
+            break;
 
-    const nickname = 
-        user.role === 'client' && userProfile?.nickname
-            ? userProfile.nickname
-            : ''
+        case 'admin':
+            displayName = user.name || 'Admin';
+            displayImage = null;
+            break;
 
-    const nicknameInitial = nickname.charAt(0).toUpperCase();
+        default:
+            displayName = 'User';
+            displayImage = null;
+    }
 
-    const profilePhoto =
-        user.role === 'client' && userProfile?.profile_photo
-            ? `/storage/${userProfile.profile_photo}`
-            : null;
+    displayInitial = displayName.charAt(0).toUpperCase();
 
 
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
@@ -112,39 +119,20 @@ export default function Authenticated({
                                             className="inline-flex items-center gap-3 rounded-full border border-slate-200 bg-white px-2 py-1 text-left shadow-sm transition hover:border-slate-300 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
                                         >
                                             <span className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-slate-950 text-sm font-black uppercase text-white shadow-sm">
-                                                {brandLogo ? (
+                                                {displayImage ? (
                                                     <img
-                                                        src={brandLogo}
-                                                        alt={brandName}
+                                                        src={displayImage}
+                                                        alt={displayName}
                                                         className="h-full w-full object-cover"
                                                     />
                                                 ) : (
-                                                    brandInitial
-                                                )}
-
-                                                {profilePhoto ? (
-                                                    <img
-                                                        src={profilePhoto}
-                                                        alt={nickname}
-                                                        className="h-full w-full object-cover"
-                                                    />
-                                                ) : (
-                                                    nicknameInitial
+                                                    displayInitial
                                                 )}
                                             </span>
 
                                             <span className="hidden sm:block">
                                                 <span className="block max-w-28 truncate text-base tracking-tight text-slate-600">
-                                                    {brandName ? (
-                                                        <p>{brandName}</p>
-                                                    ) : (
-                                                        <></>
-                                                    )}
-                                                    {nickname ? (
-                                                        <p>{nickname}</p>
-                                                    ) : (
-                                                        <></>
-                                                    )}
+                                                        <p>{displayName}</p>
                                                 </span>
                                             </span>
 
@@ -171,38 +159,20 @@ export default function Authenticated({
                                         <div className="border-b border-slate-100 px-4 py-3">
                                             <div className="flex items-center gap-3">
                                                 <span className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-slate-950 text-sm font-black uppercase text-white">
-                                                    {brandLogo ? (
+                                                    {displayImage ? (
                                                         <img
-                                                            src={brandLogo}
-                                                            alt={brandName}
+                                                            src={displayImage}
+                                                            alt={displayName}
                                                             className="h-full w-full object-cover"
                                                         />
                                                     ) : (
-                                                        brandInitial
-                                                    )}
-                                                    {profilePhoto ? (
-                                                        <img
-                                                            src={profilePhoto}
-                                                            alt={nickname}
-                                                            className="h-full w-full object-cover"
-                                                        />
-                                                    ) : (
-                                                        nicknameInitial
+                                                        displayInitial
                                                     )}
                                                 </span>
 
                                                 <div className="min-w-0">
                                                     <p className="truncate text-sm font-bold text-slate-950">
-                                                        {brandName ? (
-                                                            brandName
-                                                        ) : (
-                                                            <></>
-                                                        )}
-                                                        {nickname ? (
-                                                            nickname
-                                                        ) : (
-                                                            <></>
-                                                        )}
+                                                        {displayName}
                                                     </p>
                                                     <p className="truncate text-xs font-medium text-slate-500">
                                                         {user.email}
@@ -296,38 +266,20 @@ export default function Authenticated({
                         <div className="border-b border-slate-100 px-4 py-3">
                             <div className="flex items-center gap-3">
                                 <span className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-slate-950 text-sm font-black uppercase text-white">
-                                    {brandLogo ? (
+                                    {displayImage ? (
                                         <img
-                                            src={brandLogo}
-                                            alt={brandName}
+                                            src={displayImage}
+                                            alt={displayName}
                                             className="h-full w-full object-cover"
                                         />
                                     ) : (
-                                        brandInitial
-                                    )}
-                                    {profilePhoto ? (
-                                        <img
-                                            src={profilePhoto}
-                                            alt={nickname}
-                                            className="h-full w-full object-cover"
-                                        />
-                                    ) : (
-                                        nicknameInitial
+                                        displayInitial
                                     )}
                                 </span>
 
                                 <div className="min-w-0">
                                     <p className="truncate text-sm font-bold text-slate-950">
-                                        {brandName ? (
-                                            brandName
-                                        ) : (
-                                            <></>
-                                        )}
-                                        {nickname ? (
-                                            nickname
-                                        ) : (
-                                            <></>
-                                        )}
+                                        {displayName}
                                     </p>
                                     <p className="truncate text-xs font-medium text-slate-500">
                                         {user.email}

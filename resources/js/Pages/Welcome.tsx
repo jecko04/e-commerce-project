@@ -8,6 +8,11 @@ type VendorProfiles = {
     store_logo: string | null;
 };
 
+type UserProfiles = {
+    profile_photo: string | null;
+    nickname: string;
+}
+
 type Category = {
     id: number;
     name: string;
@@ -41,6 +46,7 @@ type Props = {
     products: Product[];
     featuredProducts: Product[];
     vendorProfile: VendorProfiles | null;
+    userProfile: UserProfiles | null;
 };
 
 export default function Welcome({
@@ -48,24 +54,43 @@ export default function Welcome({
     categories,
     featuredProducts,
     vendorProfile,
+    userProfile
 }: Props) {
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
 
     const user = auth.user;
 
-    const brandName =
-        user?.role === 'vendor' && vendorProfile?.store_name
-            ? vendorProfile.store_name
-            : 'ShopX';
+    let displayName = '';
+    let displayInitial = '';
+    let displayImage = null;
 
-    const brandInitial = brandName.charAt(0).toUpperCase();
+    switch (user?.role) {
+        case 'vendor':
+            displayName = vendorProfile?.store_name || 'ShopX';
+            displayImage = vendorProfile?.store_logo
+                ? `/storage/${vendorProfile.store_logo}`
+                : null;
+            break;
 
-    const brandLogo =
-        user?.role === 'vendor' && vendorProfile?.store_logo
-            ? `/storage/${vendorProfile.store_logo}`
-            : null;
+        case 'client':
+            displayName = userProfile?.nickname || 'User';
+            displayImage = userProfile?.profile_photo
+                ? `/storage/${userProfile.profile_photo}`
+                : null;
+            break;
 
+        case 'admin':
+            displayName = user.name || 'Admin';
+            displayImage = null;
+            break;
+
+        default:
+            displayName = 'User';
+            displayImage = null;
+    }
+
+    displayInitial = displayName.charAt(0).toUpperCase();
     return (
         <>
             <Head title="Shop Smart - Home" />
@@ -143,15 +168,15 @@ export default function Welcome({
                                                 className="inline-flex items-center gap-3 rounded-full border border-slate-200 bg-white px-2 py-1 text-left shadow-sm transition hover:border-slate-300 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
                                             >
                                                 <span className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-slate-950 text-sm font-black uppercase text-white shadow-sm">
-                                                    {brandLogo ? (
-                                                        <img src={brandLogo} alt={brandName} className="h-full w-full object-cover" />
+                                                    {displayImage ? (
+                                                        <img src={displayImage} alt={displayName} className="h-full w-full object-cover" />
                                                     ) : (
-                                                        brandInitial
+                                                        displayInitial
                                                     )}
                                                 </span>
 
                                                 <span className="block max-w-28 truncate text-sm font-semibold text-slate-600">
-                                                    {brandName}
+                                                    {displayName}
                                                 </span>
 
                                                 <svg className="h-4 w-4 text-slate-400" viewBox="0 0 20 20" fill="currentColor">
@@ -169,7 +194,7 @@ export default function Welcome({
                                             contentClasses="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl shadow-slate-200/80"
                                         >
                                             <div className="border-b border-slate-100 px-4 py-3">
-                                                <p className="truncate text-sm font-bold text-slate-950">{brandName}</p>
+                                                <p className="truncate text-sm font-bold text-slate-950">{displayName}</p>
                                                 <p className="truncate text-xs font-medium text-slate-500">{user.email}</p>
                                             </div>
 
@@ -238,7 +263,7 @@ export default function Welcome({
                                 {user ? (
                                     <>
                                         <div className="border-b border-slate-100 px-4 py-3">
-                                            <p className="truncate text-sm font-bold text-slate-950">{brandName}</p>
+                                            <p className="truncate text-sm font-bold text-slate-950">{displayName}</p>
                                             <p className="truncate text-xs font-medium text-slate-500">{user.email}</p>
                                         </div>
 
