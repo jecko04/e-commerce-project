@@ -15,7 +15,9 @@ class WelcomeController extends Controller
     public function index()
     {
         $categories = Category::all();
-        $products = Product::latest()->take(8)->get();
+        
+        $products = Product::all([]);
+
         $featuredProducts = Product::with('vendorProfile')
         ->where('is_featured', true)
         ->where('status', 'active')

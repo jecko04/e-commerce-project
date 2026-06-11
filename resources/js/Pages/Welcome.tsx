@@ -30,6 +30,7 @@ type Product = {
     status: string;
     is_featured: boolean;
     thumbnail?: string | null;
+    category_id?: number | null;
     category?: Category | null;
 };
 
@@ -52,6 +53,7 @@ type Props = {
 export default function Welcome({
     auth,
     categories,
+    products,
     featuredProducts,
     vendorProfile,
     userProfile
@@ -378,7 +380,7 @@ export default function Welcome({
                                         <div className="space-y-2 p-3">
                                             <div>
                                                 <h4 className="line-clamp-2 min-h-[2rem] text-xs font-bold leading-4 text-slate-950 group-hover:text-emerald-700">
-                                                    {featuredProduct.name}
+                                                    {featuredProduct.name.toLowerCase()}
                                                 </h4>
 
                                                 <p className="mt-1 truncate text-[11px] font-medium text-slate-500">
@@ -416,6 +418,97 @@ export default function Welcome({
                         </div>
                     </section>
                 )}
+
+                {products.length > 0 && (
+                    <section id="products" className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+                        <div className="mb-5">
+                            <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-600">All</p>
+                            <h3 className="mt-1 text-xl font-black text-slate-950">All Products</h3>
+                        </div>
+
+                        <div className="grid grid-cols-4 gap-5 sm:grid-cols-5 lg:grid-cols-7 xl:grid-cols-8">
+                         {products.map((product) => {
+                            const hasSale = Boolean(product.sale_price);
+                            const isLowStock =
+                                product.stock_quantity > 0 && product.stock_quantity <= 10;
+                            const isOutOfStock = product.stock_quantity <= 0;
+                        
+                            return (
+                                <Link
+                                    key={product.id}
+                                    href={route('vendor.view-products.show', product.slug)}
+                                    className="group overflow-hidden rounded-3xl border border-white/70 bg-white/90 shadow-sm shadow-slate-200/70 transition duration-200 hover:-translate-y-1 hover:border-emerald-300 hover:shadow-xl hover:shadow-slate-200/90 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                                >
+                                    <div
+                                        key={product.id}
+                                        className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-lg"
+                                    >
+                                        <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
+                                            {product.thumbnail ? (
+                                                <img
+                                                    src={`/storage/${product.thumbnail}`}
+                                                    alt={product.name}
+                                                    className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                                                />
+                                            ) : (
+                                                <div className="flex h-full items-center justify-center text-[11px] font-semibold text-slate-400">
+                                                    No Image
+                                                </div>
+                                            )}
+
+                                            {hasSale && (
+                                                <span className="absolute left-2 top-2 rounded-full bg-red-600 px-2 py-0.5 text-[10px] font-bold text-white shadow-sm">
+                                                    Sale
+                                                </span>
+                                            )}
+
+                                            <div className="absolute bottom-2 right-2 rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-bold text-slate-700 shadow-sm backdrop-blur">
+                                                {product.stock_quantity} left
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-2 p-3">
+                                            <div>
+                                                <h4 className="line-clamp-2 min-h-[2rem] text-xs font-bold leading-4 text-slate-950 group-hover:text-emerald-700">
+                                                    {product.name.toLowerCase()}
+                                                </h4>
+                                            </div>
+
+                                            <div>
+                                                {hasSale ? (
+                                                    <>
+                                                        <p className="truncate text-sm font-black text-red-600">
+                                                            ₱{product.sale_price}
+                                                        </p>
+                                                        <p className="truncate text-[11px] font-medium text-slate-400 line-through">
+                                                            ₱{product.price}
+                                                        </p>
+                                                    </>
+                                                ) : (
+                                                    <p className="truncate text-sm font-black text-slate-950">
+                                                        ₱{product.price}
+                                                    </p>
+                                                )}
+                                            </div>
+
+                                            <button
+                                                disabled={isOutOfStock}
+                                                className="w-full rounded-xl bg-slate-950 px-3 py-2 text-xs font-bold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+                                            >
+                                                {isOutOfStock ? 'Unavailable' : 'Add to Cart'}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </Link>
+                            );
+                         })}
+                        </div>
+                    </section>
+
+                    
+                )}
+
+
 
                 <footer className="mt-16 border-t py-10 text-center text-sm text-gray-500">
                     © {new Date().getFullYear()} ShopX. All rights reserved.

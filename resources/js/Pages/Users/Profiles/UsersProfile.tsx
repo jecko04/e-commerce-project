@@ -253,10 +253,13 @@ export default function UserProfiles({ userDetails, auth }: Props) {
                                 <div className="flex items-center justify-between gap-4">
                                     <div>
                                         <h2 className="text-lg font-black text-slate-950">
-                                            Billing Details
+                                            Billing Information
                                         </h2>
                                         <p className="mt-1 text-sm text-slate-500">
-                                            Use these for invoices and payment records.
+                                            Use the toggle to choose whether your billing information is the same as your shipping address.
+                                        </p>
+                                        <p className="mt-1 text-sm text-slate-500">
+                                            Turn it off to enter a different billing name, phone number, and address.
                                         </p>
                                     </div>
 
