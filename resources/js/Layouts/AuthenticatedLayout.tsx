@@ -3,12 +3,17 @@ import Dropdown from '@/Components/Dropdown';
 import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { Link, usePage } from '@inertiajs/react';
-import { PropsWithChildren, ReactNode, useState } from 'react';
+import { PropsWithChildren, ReactNode, useEffect, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 
 type VendorProfiles = {
     store_name: string;
     store_logo: string | null;
+}
+
+type UserProfiles = {
+    profile_photo: string | null;
+    nickname: string;
 }
 
 type PageProps = {
@@ -21,6 +26,7 @@ type PageProps = {
         };
     };
     vendorProfile: VendorProfiles | null;
+    userProfile: UserProfiles | null;
 };
 
 export default function Authenticated({
@@ -28,13 +34,13 @@ export default function Authenticated({
     children,
 }: PropsWithChildren<{ header?: ReactNode}>) {
     
-    const { auth, vendorProfile } = usePage<PageProps>().props;
+    const { auth, vendorProfile, userProfile } = usePage<PageProps>().props;
     const user = auth.user;
 
     const brandName =
         user.role === 'vendor' && vendorProfile?.store_name
             ? vendorProfile.store_name
-            : 'ShopX';
+            : '';
 
     const brandInitial = brandName.charAt(0).toUpperCase();
 
@@ -42,6 +48,19 @@ export default function Authenticated({
         user.role === 'vendor' && vendorProfile?.store_logo
             ? `/storage/${vendorProfile.store_logo}`
             : null;
+
+    const nickname = 
+        user.role === 'client' && userProfile?.nickname
+            ? userProfile.nickname
+            : ''
+
+    const nicknameInitial = nickname.charAt(0).toUpperCase();
+
+    const profilePhoto =
+        user.role === 'client' && userProfile?.profile_photo
+            ? `/storage/${userProfile.profile_photo}`
+            : null;
+
 
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
@@ -102,12 +121,27 @@ export default function Authenticated({
                                                 ) : (
                                                     brandInitial
                                                 )}
+
+                                                {profilePhoto ? (
+                                                    <img
+                                                        src={profilePhoto}
+                                                        alt={nickname}
+                                                        className="h-full w-full object-cover"
+                                                    />
+                                                ) : (
+                                                    nicknameInitial
+                                                )}
                                             </span>
 
                                             <span className="hidden sm:block">
                                                 <span className="block max-w-28 truncate text-base tracking-tight text-slate-600">
                                                     {brandName ? (
                                                         <p>{brandName}</p>
+                                                    ) : (
+                                                        <></>
+                                                    )}
+                                                    {nickname ? (
+                                                        <p>{nickname}</p>
                                                     ) : (
                                                         <></>
                                                     )}
@@ -146,11 +180,29 @@ export default function Authenticated({
                                                     ) : (
                                                         brandInitial
                                                     )}
+                                                    {profilePhoto ? (
+                                                        <img
+                                                            src={profilePhoto}
+                                                            alt={nickname}
+                                                            className="h-full w-full object-cover"
+                                                        />
+                                                    ) : (
+                                                        nicknameInitial
+                                                    )}
                                                 </span>
 
                                                 <div className="min-w-0">
                                                     <p className="truncate text-sm font-bold text-slate-950">
-                                                        {brandName}
+                                                        {brandName ? (
+                                                            brandName
+                                                        ) : (
+                                                            <></>
+                                                        )}
+                                                        {nickname ? (
+                                                            nickname
+                                                        ) : (
+                                                            <></>
+                                                        )}
                                                     </p>
                                                     <p className="truncate text-xs font-medium text-slate-500">
                                                         {user.email}
@@ -172,7 +224,7 @@ export default function Authenticated({
                                         )}
 
                                         {user.role === 'client' && (
-                                            <Dropdown.Link href={route('profile.edit')}>
+                                            <Dropdown.Link href={route('user.profile')}>
                                                 Client Profile
                                             </Dropdown.Link>
                                         )}
@@ -253,11 +305,29 @@ export default function Authenticated({
                                     ) : (
                                         brandInitial
                                     )}
+                                    {profilePhoto ? (
+                                        <img
+                                            src={profilePhoto}
+                                            alt={nickname}
+                                            className="h-full w-full object-cover"
+                                        />
+                                    ) : (
+                                        nicknameInitial
+                                    )}
                                 </span>
 
                                 <div className="min-w-0">
                                     <p className="truncate text-sm font-bold text-slate-950">
-                                        {brandName}
+                                        {brandName ? (
+                                            brandName
+                                        ) : (
+                                            <></>
+                                        )}
+                                        {nickname ? (
+                                            nickname
+                                        ) : (
+                                            <></>
+                                        )}
                                     </p>
                                     <p className="truncate text-xs font-medium text-slate-500">
                                         {user.email}

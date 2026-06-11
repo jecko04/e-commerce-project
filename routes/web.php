@@ -9,6 +9,7 @@ use App\Http\Controllers\Vendor\VendorProductController;
 use App\Http\Controllers\Vendor\InventoryController;
 use App\Http\Controllers\Vendor\VendorViewProductController;
 use App\Http\Controllers\Vendor\Profiles\VendorProfilesController;
+use App\Http\Controllers\Users\Profiles\UsersProfileController;
 use App\Http\Controllers\WelcomeController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -17,9 +18,14 @@ use Inertia\Inertia;
 
 Route::get('/', [WelcomeController::class, 'index'])->name('home');
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'role:client', 'verified'])->name('dashboard');
+Route::middleware(['auth', 'role:client', 'verified'])->prefix('user')->group(function () {
+    Route::get('/dashboard', function () {
+        return Inertia::render('Users/Dashboard');
+    })->name('dashboard');
+
+    Route::get('/profile', [UsersProfileController::class, 'edit'])->name('user.profile');
+    Route::post('/profile', [UsersProfileController::class, 'update'])->name('user.profile.update');
+});
 
 Route::middleware(['auth', 'role:vendor', 'verified'])->prefix('vendor')->group(function () {
     Route::get('/dashboard', function () {

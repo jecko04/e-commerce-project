@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use App\Models\VendorProfilesModel;
+use App\Models\UsersProfileModel;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -47,6 +48,11 @@ class HandleInertiaRequests extends Middleware
             'vendorProfile' => fn () => auth()->check() && auth()->user()->role === 'vendor'
                 ? VendorProfilesModel::where('vendor_id', auth()->id())
                     ->select('store_name', 'store_logo')
+                    ->first()
+                : null,
+            'userProfile' => fn () => auth()->check() && auth()->user()->role === 'client'
+                ? UsersProfileModel::where('user_id', auth()->id())
+                    ->select('nickname', 'profile_photo')
                     ->first()
                 : null,
         ];
