@@ -16,7 +16,7 @@ class WelcomeController extends Controller
     {
         $categories = Category::all();
         
-        $products = Product::all([]);
+        $products = Product::all();
 
         $featuredProducts = Product::with('vendorProfile')
         ->where('is_featured', true)

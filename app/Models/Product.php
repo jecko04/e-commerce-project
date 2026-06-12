@@ -7,6 +7,8 @@ use App\Models\VendorProfilesModel;
 
 class Product extends Model
 {
+    protected $table = 'products';
+
     protected $fillable = [
         'vendor_id',
         'category_id',
