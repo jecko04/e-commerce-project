@@ -44,7 +44,7 @@ Route::middleware(['auth', 'role:vendor', 'verified'])->prefix('vendor')->group(
     Route::post('/profile', [VendorProfilesController::class, 'update'])->name('vendor.profile.update');
 });
 
-Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+Route::get('/view-products/{slug}', [ProductController::class, 'show'])->name('view-products.show');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
