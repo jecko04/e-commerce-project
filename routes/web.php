@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Pages\ProductController;
+use App\Http\Controllers\Pages\AddToCartController;
 use App\Http\Controllers\Vendor\VendorProfileController;
 use App\Http\Controllers\Vendor\VendorDashboardController;
 use App\Http\Controllers\Vendor\AddProductController;
@@ -25,6 +26,8 @@ Route::middleware(['auth', 'role:client', 'verified'])->prefix('user')->group(fu
 
     Route::get('/profile', [UsersProfileController::class, 'edit'])->name('user.profile');
     Route::post('/profile', [UsersProfileController::class, 'update'])->name('user.profile.update');
+    Route::get('/view-add-to-cart', [AddToCartController::class, 'index'])->name('view-add-to-cart.index');
+    Route::post('/view-add-to-cart/{productId}', [AddToCartController::class, 'store'])->name('view-add-to-cart.store');
 });
 
 Route::middleware(['auth', 'role:vendor', 'verified'])->prefix('vendor')->group(function () {

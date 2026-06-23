@@ -122,7 +122,7 @@ export default function GuestNav({
 
                     {user?.role !== 'vendor' && user?.role !== 'admin' && (
                         <Link
-                            href="#cart"
+                            href={route('view-add-to-cart.index')}
                             className="hidden h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700 sm:inline-flex"
                             aria-label="Cart"
                         >

@@ -167,10 +167,6 @@ export default function Welcome({
                                         >
                                             View Product →
                                         </Link>
-
-                                        <button className="rounded-2xl border border-white/20 px-6 py-3 font-bold text-white transition hover:bg-white/10">
-                                            Add to Cart
-                                        </button>
                                     </div>
                                 </div>
 
@@ -237,7 +233,13 @@ export default function Welcome({
                                             product.stock_quantity <= 0;
 
                                         return (
+                                            
                                             <SwiperSlide key={product.id}>
+                                                <Link
+                                                    key={product.id}
+                                                    href={route('view-products.show', product.slug)}
+                                                    className="group overflow-hidden rounded-3xl border border-white/70 bg-white/90 shadow-sm shadow-slate-200/70 transition duration-200 hover:-translate-y-1 hover:border-emerald-300 hover:shadow-xl hover:shadow-slate-200/90 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                                                >   
                                                 <div className="group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-lg transition duration-300 hover:-translate-y-2 hover:shadow-2xl">
 
                                                     <div className="relative h-56 overflow-hidden">
@@ -305,17 +307,9 @@ export default function Welcome({
                                                                     : `${product.stock_quantity} Available`}
                                                             </span>
                                                         </div>
-
-                                                        <button
-                                                            disabled={isOutOfStock}
-                                                            className="mt-4 w-full rounded-2xl bg-slate-950 py-3 text-sm font-bold text-white transition hover:bg-emerald-600 disabled:cursor-not-allowed disabled:opacity-50"
-                                                        >
-                                                            {isOutOfStock
-                                                                ? 'Unavailable'
-                                                                : 'Add to Cart'}
-                                                        </button>
                                                     </div>
                                                 </div>
+                                                </Link>
                                             </SwiperSlide>
                                         );
                                     })}
@@ -396,13 +390,6 @@ export default function Welcome({
                                                     </p>
                                                 )}
                                             </div>
-
-                                            <button
-                                                disabled={isOutOfStock}
-                                                className="w-full rounded-xl bg-slate-950 px-3 py-2 text-xs font-bold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
-                                            >
-                                                {isOutOfStock ? 'Unavailable' : 'Add to Cart'}
-                                            </button>
                                         </div>
                                     </div>
                                 </Link>

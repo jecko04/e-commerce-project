@@ -1,7 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
 import toast from 'react-hot-toast';
-import { usePage } from '@inertiajs/react';
-import { useEffect } from 'react';
+import { usePage, useForm } from '@inertiajs/react';
+import { useEffect, FormEventHandler, useState } from 'react';
 import GuestNav from '@/Components/GuestNav';
 
 type VendorProfiles = {
@@ -68,6 +68,26 @@ export default function ViewProduct({
     const lowStockLimit = 10;
 
 const { flash, auth } = usePage<PageProps>().props;
+const [ quantity, setQuantity ] = useState(1);
+
+    useEffect(() => {
+        setData('quantity', quantity);
+    }, [quantity]);
+
+
+    const increase = () => {
+        if (quantity < product.stock_quantity) {
+            const value = quantity + 1;
+            setQuantity(value);
+            setData('quantity', value);
+        }
+    };
+
+    const decrease = () => {
+        if (quantity > 1) {
+            setQuantity(prev => prev - 1);
+        }
+    };      
 
     useEffect(() => {
         if (flash?.success) {
@@ -106,6 +126,21 @@ const { flash, auth } = usePage<PageProps>().props;
                     className: 'bg-emerald-50 text-emerald-700 ring-emerald-200',
                     note: 'This product has enough stock available for customer orders.',
                 };
+
+    
+    const { data, setData, post, processing, errors, reset } = useForm({
+        product_id: product.id,
+        quantity: 1,    
+    });
+
+    const submit: FormEventHandler = (e) => {
+            e.preventDefault();
+    
+            post(route('view-add-to-cart.store', product.id), {
+                preserveScroll: true,
+            });
+        };
+
 
     return (
         <>
@@ -237,16 +272,18 @@ const { flash, auth } = usePage<PageProps>().props;
 
                             <div className="flex items-center gap-3">
                                 <button
+                                    onClick={decrease}
                                     className="flex h-11 w-11 items-center justify-center rounded-xl border border-slate-300 transition hover:bg-slate-100"
                                 >
                                     -
                                 </button>
 
-                                <span className="w-10 text-center font-bold">
-                                    1
-                                </span>
+                                <p className="w-10 text-center font-bold">
+                                    {quantity}
+                                </p>
 
                                 <button
+                                    onClick={increase}
                                     className="flex h-11 w-11 items-center justify-center rounded-xl border border-slate-300 transition hover:bg-slate-100"
                                 >
                                     +
@@ -255,9 +292,10 @@ const { flash, auth } = usePage<PageProps>().props;
                         </div>
 
                         {/* Buttons */}
-                        <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+                        <form onSubmit={submit} className="mt-10 flex flex-col gap-3 sm:flex-row">
 
                             <button
+                                type="submit"
                                 disabled={product.stock_quantity <= 0}
                                 className="flex-1 rounded-2xl border-2 border-emerald-600 bg-white py-4 font-bold text-emerald-600 transition hover:bg-emerald-50 disabled:cursor-not-allowed disabled:opacity-50"
                             >
@@ -271,7 +309,7 @@ const { flash, auth } = usePage<PageProps>().props;
                                 Buy Now
                             </button>
 
-                        </div>
+                        </form>
 
                         {/* Description */}
                         <div className="mt-10 rounded-3xl border border-slate-200 bg-white p-6">
@@ -312,10 +350,7 @@ const { flash, auth } = usePage<PageProps>().props;
 
                     </div>
                 </div>
-                </div>
-            </div>
-
-            <section className="mt-16">
+                <section className="mt-16">
                 <div className="mb-6">
                     <h2 className="text-2xl font-black text-slate-950">
                         Related Products
@@ -366,6 +401,12 @@ const { flash, auth } = usePage<PageProps>().props;
                     ))}
                 </div>
             </section>
+                </div>
+
+            
+            </div>
+
+            
        </>
 
     );
