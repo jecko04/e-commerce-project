@@ -70,16 +70,9 @@ export default function ViewProduct({
 const { flash, auth } = usePage<PageProps>().props;
 const [ quantity, setQuantity ] = useState(1);
 
-    useEffect(() => {
-        setData('quantity', quantity);
-    }, [quantity]);
-
-
     const increase = () => {
         if (quantity < product.stock_quantity) {
-            const value = quantity + 1;
-            setQuantity(value);
-            setData('quantity', value);
+            setQuantity(prev => prev + 1);
         }
     };
 
@@ -87,7 +80,11 @@ const [ quantity, setQuantity ] = useState(1);
         if (quantity > 1) {
             setQuantity(prev => prev - 1);
         }
-    };      
+    };
+
+    useEffect(() => {
+        setData('quantity', quantity);
+    }, [quantity]); 
 
     useEffect(() => {
         if (flash?.success) {
@@ -130,9 +127,10 @@ const [ quantity, setQuantity ] = useState(1);
     
     const { data, setData, post, processing, errors, reset } = useForm({
         product_id: product.id,
-        quantity: 1,    
+        quantity: quantity,    
     });
 
+    
     const submit: FormEventHandler = (e) => {
             e.preventDefault();
     
@@ -296,10 +294,10 @@ const [ quantity, setQuantity ] = useState(1);
 
                             <button
                                 type="submit"
-                                disabled={product.stock_quantity <= 0}
+                                disabled={processing || product.stock_quantity <= 0}
                                 className="flex-1 rounded-2xl border-2 border-emerald-600 bg-white py-4 font-bold text-emerald-600 transition hover:bg-emerald-50 disabled:cursor-not-allowed disabled:opacity-50"
                             >
-                                Add To Cart
+                                {processing ? 'Adding...' : 'Add To Cart'}
                             </button>
 
                             <button

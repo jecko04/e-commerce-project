@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Pages;
 
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\CartItem;
 use App\Models\Product;
@@ -11,6 +12,8 @@ class AddToCartController extends Controller
 {
     public function index()
     {
+        // $product = Product::All();
+
         $cartItems = CartItem::with([
             'product:id,name,slug,price,sale_price,thumbnail,stock_quantity'
         ])
@@ -29,15 +32,26 @@ class AddToCartController extends Controller
         ]);
     }
 
-    public function store($productId)
+   public function store(Request $request, $productId)
     {
         $product = Product::findOrFail($productId);
+
+        $request->validate([
+            'quantity' => [
+                'required',
+                'integer',
+                'min:1',
+                'max:' . $product->stock_quantity,
+            ],
+        ]);
+
         $cartItem = CartItem::firstOrNew([
             'user_id' => auth()->id(),
             'product_id' => $productId,
         ]);
 
-        $cartItem->quantity = ($cartItem->quantity ?? 0) + 1;
+        $cartItem->quantity =
+            ($cartItem->quantity ?? 0) + $request->quantity;
 
         $cartItem->save();
 

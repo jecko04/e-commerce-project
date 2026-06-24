@@ -1,25 +1,61 @@
 import { Head, Link } from '@inertiajs/react';
 import GuestNav from '@/Components/GuestNav';
+import toast from 'react-hot-toast';
+import { usePage } from '@inertiajs/react';
+import { useEffect } from 'react';
+
+
+type Product = {
+    id: number;
+    name: string;
+    slug: string;
+    price: number;
+    sale_price?: number | null;
+    thumbnail?: string | null;
+    stock_quantity: number;
+};
 
 type CartItem = {
     id: number;
-    name: string;
-    price: number;
+    product_id: number;
     quantity: number;
-    thumbnail?: string | null;
+    product: Product;
 };
 
-type Props = {
-    auth: any;
+type PageProps = {
+    auth: {
+        user: {
+            id: number;
+            name: string;
+            email: string;
+            role: string;
+        };
+    };
     cartItems: CartItem[];
     total: number;
+
+    flash?: {
+        success?: string;
+        error?: string;
+    };
 };
 
 export default function AddToCart({
-    auth,
     cartItems,
     total,
-}: Props) {
+}: PageProps) {
+    const { flash, auth } = usePage<PageProps>().props;
+
+    useEffect(() => {
+        if (flash?.success) {
+            toast.success(flash.success);
+        }
+
+        if (flash?.error) {
+            toast.error(flash.error);
+        }
+    }, [flash]);
+    
     return (
         <>
             <Head title="Shopping Cart" />
@@ -43,7 +79,6 @@ export default function AddToCart({
                     </div>
 
                     <div className="grid gap-8 lg:grid-cols-3">
-                        {/* Cart Items */}
                         <div className="lg:col-span-2 space-y-4">
                             {cartItems.length > 0 ? (
                                 cartItems.map((item) => (
@@ -52,10 +87,10 @@ export default function AddToCart({
                                         className="flex gap-4 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm"
                                     >
                                         <div className="h-28 w-28 overflow-hidden rounded-2xl bg-slate-100">
-                                            {item.thumbnail ? (
+                                            {item.product.thumbnail ? (
                                                 <img
-                                                    src={`/storage/${item.thumbnail}`}
-                                                    alt={item.name}
+                                                    src={`/storage/${item.product.thumbnail}`}
+                                                    alt={item.product.name}
                                                     className="h-full w-full object-cover"
                                                 />
                                             ) : (
@@ -68,12 +103,18 @@ export default function AddToCart({
                                         <div className="flex flex-1 flex-col justify-between">
                                             <div>
                                                 <h3 className="text-lg font-bold text-slate-950">
-                                                    {item.name}
+                                                    {item.product.name}
                                                 </h3>
 
+                                            {item.product.sale_price ? (
                                                 <p className="mt-1 text-emerald-600 font-black">
-                                                    ₱{item.price.toLocaleString()}
+                                                    ₱{item.product.sale_price}
                                                 </p>
+                                            ) : (
+                                                <p className="mt-1 text-emerald-600 font-black">
+                                                    ₱{item.product.price}
+                                                </p>
+                                            )}
                                             </div>
 
                                             <div className="flex items-center justify-between">
@@ -118,7 +159,6 @@ export default function AddToCart({
                             )}
                         </div>
 
-                        {/* Order Summary */}
                         <div>
                             <div className="sticky top-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
                                 <h2 className="text-xl font-black text-slate-950">

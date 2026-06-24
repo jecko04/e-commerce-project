@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\VendorProfilesModel;
+use App\Models\Category;
+use App\Models\CartItem;
 
 class Product extends Model
 {
@@ -41,4 +43,10 @@ class Product extends Model
     {
         return $this->hasOne(VendorProfilesModel::class, 'vendor_id', 'vendor_id');
     }
+
+    public function cartItem()
+    {
+        return $this->hasOne(CartItem::class, 'productId', 'productId');
+    }
+
 }
