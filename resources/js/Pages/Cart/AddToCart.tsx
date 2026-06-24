@@ -22,6 +22,17 @@ type CartItem = {
     product: Product;
 };
 
+type VendorProfiles = {
+    store_name: string;
+    store_logo: string | null;
+};
+
+type UserProfiles = {
+    profile_photo: string | null;
+    nickname: string;
+}
+
+
 type PageProps = {
     auth: {
         user: {
@@ -38,11 +49,16 @@ type PageProps = {
         success?: string;
         error?: string;
     };
+
+    vendorProfile: VendorProfiles | null;
+    userProfile: UserProfiles | null;
 };
 
 export default function AddToCart({
     cartItems,
     total,
+    vendorProfile,
+    userProfile,
 }: PageProps) {
     const { flash, auth } = usePage<PageProps>().props;
 
@@ -61,7 +77,7 @@ export default function AddToCart({
             <Head title="Shopping Cart" />
 
             <div className="min-h-screen bg-white">
-                <GuestNav auth={auth} />
+                <GuestNav auth={auth}  vendorProfile={vendorProfile} userProfile={userProfile}  />
 
                 <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
                     <div className="mb-8">

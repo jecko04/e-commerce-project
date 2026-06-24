@@ -85,7 +85,7 @@ export default function GuestNav({
                     </span>
                 </Link>
 
-                <div className="hidden flex-1 md:block">
+                <div className="flex-1 md:block">
                     <div className="relative">
                         <input
                             type="text"
@@ -112,7 +112,7 @@ export default function GuestNav({
                 <nav className="ml-auto flex items-center gap-2">
                     <button
                         type="button"
-                        className="hidden h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700 sm:inline-flex"
+                        className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700"
                         aria-label="Notifications"
                     >
                         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
@@ -123,7 +123,7 @@ export default function GuestNav({
                     {user?.role !== 'vendor' && user?.role !== 'admin' && (
                         <Link
                             href={route('view-add-to-cart.index')}
-                            className="hidden h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700 sm:inline-flex"
+                            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700"
                             aria-label="Cart"
                         >
                             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
@@ -231,6 +231,7 @@ export default function GuestNav({
             </div>
 
             {showingNavigationDropdown && (
+                <>
                 <div className="border-t bg-white px-4 py-3 sm:hidden">
                     {user?.role === 'vendor' && (
                         <Dropdown.Link href={route('vendor.dashboard')}>
@@ -256,6 +257,7 @@ export default function GuestNav({
                             method="post"
                             href={route('logout')}
                             as="button"
+                            className='px-4'
                         >
                             Logout
                         </ResponsiveNavLink>
@@ -271,6 +273,8 @@ export default function GuestNav({
                         </>
                     )}
                 </div>
+                </>
+
             )}
         </header>
     );
